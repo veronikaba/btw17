@@ -10,6 +10,7 @@ from flask import render_template
 from flask import g
 from numpy import genfromtxt
 import csv
+import logging
 import sqlite3
 
 def Load_Data(file_name):
@@ -21,24 +22,23 @@ engine = create_engine('sqlite:///btw17.db')
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind = engine, autocommit = True)
 session = Session()
-
-
 app = Flask(__name__)
 
+con = sqlite3.connect('btw17.db')
+cur = con.cursor()
+cur.execute("CREATE TABLE btw17 (Nr, Gebiet, gehoert_zu, Wahlberechtigte);")
+with open('btw17_kerg_modify.csv','rt', encoding = 'utf-8') as fin:
+        dr = csv.DictReader(fin)
+        to_db = [(i['Nr'], i['Gebiet'], i['gehoert_zu'], i['Wahlberechtigte']) for i in dr if i[0] != ""]
+cur.executemany("INSERT INTO btw17 (Nr, Gebiet, gehoert_zu, Wahlberechtigte) VALUES (?, ?, ?, ?);", to_db)
+con.commit()
+con.close()
 
 def get_db () :
  if not hasattr(g,'sqlite_db'):
   con = sqlite3.connect('btw17.db')
   cur = con.cursor()
-  cur.execute("CREATE TABLE btw17 (Nr, Gebiet , gehoert_zu, Wahlberechtigte, Wahlberechtigte_Zweitstimmen);")
   g.sqlite_db = con
-  with open('btw17_kerg_modify.csv','rb') as fin:
-        dr = csv.DictReader(fin)
-        to_db = [(i['Nr'], i['Gebiet'], i['gehoert_zu'],i['Wahlberechtigte'], i['Wahlberechtigte_Zweitstimmen']) for i in dr]
-    
-  cur.executemany("INSERT INTO btw17 (Nr, Gebiet, gehoert_zu, Wahlberechtigte, Wahlberechtigte_Zweitstimmen) VALUES (?, ?, ?, ?, ?);", to_db)
-  con.commit()
-  con.close()
  return g.sqlite_db
 
 @app.teardown_appcontext
