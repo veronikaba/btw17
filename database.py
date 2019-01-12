@@ -9,6 +9,7 @@ from flask import Flask
 from flask import render_template
 from flask import g
 from numpy import genfromtxt
+import csv
 import sqlite3
 
 def Load_Data(file_name):
@@ -25,78 +26,19 @@ session = Session()
 app = Flask(__name__)
 
 
-
-
-class State(Base):
-    __tablename__ = 'states'
-    id = Column(Integer, primary_key = True, nullable = False)
-    belongs_to = Column(Integer)
-    leftover = Column(Integer)
-    number = Column(Integer)
-    constituencies = relationship('Constituency')
-
-
-#constintuency_party = Table ('constituency_parties',
-#    Base.metadata,
-#   Column (constituency_id,Integer, ForeignKey('parties.id')),
-#   Column (party_id,Integer, ForeignKey('constituencies.id')))
- 
-class Constituency(Base):
-    __tablename__ = 'constituencies'    
-    id = Column(Integer, primary_key = True, nullable = False)
-    number = Column(Integer)
-    state_id = Column(Integer, ForeignKey('states.id'))
-    state = relationship('State')
-    parties = relationship('Party')
-    belongs_to = Column(Integer)
-
-class Party(Base):
-    __tablename__ = 'parties'
-    id = Column(Integer, primary_key = True, nullable = False)
-    name = Column(String)
-    constituency_id = Column(Integer, ForeignKey('constituencies.id'))
-    constituency = relationship('Constituency')
-    votes = relationship("Votes")
- 
-class Votes(Base):
-    __tablename__ = 'votes'
-    id = Column(Integer, primary_key=True)
-    provisionally_votes = Column(Integer)
-    party_id = Column(Integer, ForeignKey('parties.id'))
-    party = relationship('Party')
-
-
-try:
-    file_name = 'btw17_kerg_modify.csv'
-    data = Load_Data(file_name)
-
-    for i in data:
-        constituency = Constituency(**{
-         'name' : i[1],
-         'number' : i[0],
-         'belongs_to' : i[2]
-        })
-        j = 3
-        if j % 4 == 0:
-            record = Party(**{
-                'name' : i[i+1],
-                'constituency_id' : constituency.id
-             })
-        session.add(record)
-        session.add(constituency)
-        session.commit()
-except:
-    session.rollback()
-
-finally:
-    session.close()
-    
-
-
 def get_db () :
  if not hasattr(g,'sqlite_db'):
   con = sqlite3.connect('btw17.db')
+  cur = con.cursor()
+  cur.execute("CREATE TABLE btw17 (Nr, Gebiet , gehoert_zu, Wahlberechtigte, Wahlberechtigte_Zweitstimmen);")
   g.sqlite_db = con
+  with open('btw17_kerg_modify.csv','rb') as fin:
+        dr = csv.DictReader(fin)
+        to_db = [(i['Nr'], i['Gebiet'], i['gehoert_zu'],i['Wahlberechtigte'], i['Wahlberechtigte_Zweitstimmen']) for i in dr]
+    
+  cur.executemany("INSERT INTO btw17 (Nr, Gebiet, gehoert_zu, Wahlberechtigte, Wahlberechtigte_Zweitstimmen) VALUES (?, ?, ?, ?, ?);", to_db)
+  con.commit()
+  con.close()
  return g.sqlite_db
 
 @app.teardown_appcontext
