@@ -24,33 +24,33 @@ app = Flask(__name__)
 class State(Base):
     __tablename__ = 'states'
     id = Column(Integer, primary_key = True, nullable = False)
-    belongs_to = Column(Integer)
-    leftover = Column(Integer)
-    number = Column(Integer)
+    belongs_to = Column(Integer),
+    leftover = Column(Integer),
+    number = Column(Integer),
+    constituencies = relationship('Constituency')
 
 class Constituency(Base):
     __tablename__ = 'constituencies',
     id = Column(Integer, primary_key = True, nullable = False)
-    numberr = Column(Integer)
-    relationship("Party")
+    number = Column(Integer),
+    state_id = Column(Integer, ForeignKey('states.id')),
+    state = relationship('State'),
+    parties = relationship('Party')
 
 class Party(Base):
     __tablename__ = 'parties',
     id = Column(Integer, primary_key = True, nullable = False),
     name = Column(String),
-    area_id = Column(Integer, ForeignKey("constituencies.id"))
-    voter = relationship("Voter") 
-
-class Voter(Base):
-
-    id = Column(Integer, primary_key=True)
-    relationship("Votes")
-
+    constituency_id = Column(Integer, ForeignKey('constituencies.id')),
+    constituency = relationship('Constituency'),
+    votes = relationship("Votes")
+ 
 class Votes(Base):
-    id = Column(primary_key = True),
-    provisionally = Column(Integer),
-    before_period = Column(Integer)
-
+    __tablename__ = 'votes'
+    id = Column(Integer, primary_key=True)
+    provisionallyVotes = Column(Integer)
+    party_id = Column(Integer, ForeignKey('parties.id'))
+    party = relationship('Party')
 
 
     
