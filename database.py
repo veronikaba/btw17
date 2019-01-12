@@ -11,7 +11,7 @@ from flask import g
 import sqlite3
 
 
-engine = create_engine('sqlite:///wahlkreise.db')
+engine = create_engine('sqlite:///btw17.db')
 Session = sessionmaker(bind = engine, autocommit = True)
 session = Session()
 
@@ -51,11 +51,11 @@ class Votes(Base):
     party_id = Column(Integer, ForeignKey('parties.id'))
     party = relationship('Party')
 
-Base.metadata.Base.create_engine(engine)
+Base.metadata.create_all(engine)
     
 def get_db () :
  if not hasattr(g,'sqlite_db'):
-  con = sqlite3.connect('whalkreis.db')#typo?
+  con = sqlite3.connect('btw17.db')#typo?
 
   g.sqlite_db = con
  return g.sqlite_db
