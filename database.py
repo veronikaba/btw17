@@ -15,34 +15,33 @@ engine = create_engine('sqlite:///wahlkreise.db')
 Session = sessionmaker(bind = engine, autocommit = True)
 session = Session()
 
-Base = declarative_base()
 
 app = Flask(__name__)
 
 
-
+Base = declarative_base()
 class State(Base):
     __tablename__ = 'states'
     id = Column(Integer, primary_key = True, nullable = False)
-    belongs_to = Column(Integer),
-    leftover = Column(Integer),
-    number = Column(Integer),
+    belongs_to = Column(Integer)
+    leftover = Column(Integer)
+    number = Column(Integer)
     constituencies = relationship('Constituency')
 
 class Constituency(Base):
-    __tablename__ = 'constituencies',
+    __tablename__ = 'constituencies'    
     id = Column(Integer, primary_key = True, nullable = False)
-    number = Column(Integer),
-    state_id = Column(Integer, ForeignKey('states.id')),
-    state = relationship('State'),
+    number = Column(Integer)
+    state_id = Column(Integer, ForeignKey('states.id'))
+    state = relationship('State')
     parties = relationship('Party')
 
 class Party(Base):
-    __tablename__ = 'parties',
-    id = Column(Integer, primary_key = True, nullable = False),
-    name = Column(String),
-    constituency_id = Column(Integer, ForeignKey('constituencies.id')),
-    constituency = relationship('Constituency'),
+    __tablename__ = 'parties'
+    id = Column(Integer, primary_key = True, nullable = False)
+    name = Column(String)
+    constituency_id = Column(Integer, ForeignKey('constituencies.id'))
+    constituency = relationship('Constituency')
     votes = relationship("Votes")
  
 class Votes(Base):
@@ -52,7 +51,7 @@ class Votes(Base):
     party_id = Column(Integer, ForeignKey('parties.id'))
     party = relationship('Party')
 
-
+Base.metadata.Base.create_engine(engine)
     
 def get_db () :
  if not hasattr(g,'sqlite_db'):
@@ -64,3 +63,5 @@ def get_db () :
 @app.teardown_appcontext
 def close_db (error):
   if hasattr (g, 'sqlite_db'):g.sqlite_db.close ()
+
+app.run(debug = True)
