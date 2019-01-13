@@ -26,11 +26,11 @@ app = Flask(__name__)
 
 con = sqlite3.connect('btw17.db')
 cur = con.cursor()
-cur.execute("CREATE TABLE btw17 (Nr, Gebiet, gehoert_zu, Wahlberechtigte);")
+cur.execute("CREATE TABLE btw17 (Nr, Gebiet, gehoert_zu, Wahlberechtigte, Wähler);")
 with open('btw17_kerg_modify.csv','rt', encoding = 'utf-8') as fin:
         dr = csv.DictReader(fin)
-        to_db = [(i['Nr'], i['Gebiet'], i['gehoert_zu'], i['Wahlberechtigte']) for i in dr if i[0] != ""]
-cur.executemany("INSERT INTO btw17 (Nr, Gebiet, gehoert_zu, Wahlberechtigte) VALUES (?, ?, ?, ?);", to_db)
+        to_db = [(i['Nr'], i['Gebiet'], i['gehoert_zu'], i['Wahlberechtigte'],  i['Wähler']) for i in dr if i[0] != ""]
+cur.executemany("INSERT INTO btw17 (Nr, Gebiet, gehoert_zu, Wahlberechtigte, Wähler) VALUES (?, ?, ?, ?, ?);", to_db)
 con.commit()
 con.close()
 
@@ -44,4 +44,5 @@ def get_db () :
 @app.teardown_appcontext
 def close_db (error):
   if hasattr (g, 'sqlite_db'):g.sqlite_db.close ()
+
 app.run(debug = True)
