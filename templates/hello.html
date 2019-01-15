@@ -12,19 +12,19 @@
     crossorigin="anonymous">
 </head>
 
-<body ng-app="myApp">
+<body ng-app="app">
   <div class="container">
     <div class="row">
-      <div class="col" ng-controller="myCtrl">
+      <div class="col" ng-controller="main_controller">
         <h1>Bundesland</h1>
         <ul>
-          <li ng-repeat="state in states"><a href="#"></a> {{state}} </li>
+          <li ng-repeat="state in states"><a href ng-click="showConstituencies()">{{state}}</a></li>
         </ul>
       </div>
-      <div class="col" ng-controller="constituenyCtrl">
+      <div class="col">
         <h1>Wahlkreis</h1>
         <input type="text">
-        <li ng-repeat="constituency in constituencies"><a href="#"></a> {{constituency}} </li>
+        <li ng-repeat="constituency in constituencies"><a href="#"> {{constituency}}</a></li>
       </div>
       <div class="col">
         <h1>Ergebnis</h1>
@@ -32,42 +32,5 @@
       </div>
     </div>
   </div>
-
-  <!--<h1 ng-repeat="name in all_names">{{name}} + "test"</h1>-->
-
-  <script>
-    var app = angular.module("myApp", []);
-    app.controller("myCtrl", function ($scope) {
-      $scope.states = [
-        "Baden-Wüttemberg",
-        "Bayern",
-        "Berlin",
-        "Brandenburg",
-        "Bremen",
-        "Hamburg",
-        "Hessen",
-        "Mecklenburg-Vorpommern",
-        "Niedersachsen",
-        "Nordreihn-Westfalen",
-        "Reihnland-Pfalz",
-        "Saarland",
-        "Sachsen",
-        "Sachsen-Anhalt",
-        "Schleswig-Holstein",
-        "Thüringen",
-      ];
-    });
-  </script>
-  <!-- <script>
-    var app = angular.module("myApp", []);
-    app.controller("constituenyCtrl", function ($scope) {
-      $scope.constituencies = [
-        "Berlin-Charlottenburg-Wilmersdorf",
-        "Berlin-Friedrichshein-Kreuzberg-Prenzlauerberg Ost",
-        "Berlin-Lichtenberg",
-        "Berlin-Marzah-Hellerdorf",
-      ];
-    });
-  </script> -->
 
 </body>
