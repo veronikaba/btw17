@@ -10,6 +10,10 @@
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
     crossorigin="anonymous">
+
+  <!-- chart.js and angular-chart.js -->
+  <script src="../static/bower_components/chart.js/Chart.min.js"></script>
+  <script src="../static/bower_components/angular-chart.js/dist/angular-chart.min.js"></script>
 </head>
 
 <body ng-app="app">
@@ -30,9 +34,43 @@
       </div>
       <div class="col">
         <h1>Ergebnis</h1>
-        <input type="text">
+        <h3>Wahlkreis</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                  <th>Partei</th>
+                  <th>Erststimme</th>
+                  <th>Zweitstimme</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>John</td>
+                  <td>Doe</td>
+                  <td>john@example.com</td>
+                </tr>
+                <tr>
+                  <td>Mary</td>
+                  <td>Moe</td>
+                  <td>mary@example.com</td>
+                </tr>
+                <tr>
+                  <td>July</td>
+                  <td>Dooley</td>
+                  <td>july@example.com</td>
+                </tr>
+              </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col" ng-controller="BarCtrl">
+          <canvas id="bar" class="chart chart-bar"
+            chart-data="data" chart-labels="labels"> chart-series="series"
+          </canvas>
+      </div>
+      <div class="col">
       </div>
     </div>
   </div>
-
 </body>

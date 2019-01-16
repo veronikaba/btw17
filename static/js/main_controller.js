@@ -34,6 +34,8 @@ var app = angular.module('app', []);
       ];
       /*constituencies.push($scope.test);*/
     }
+
+
   });
 
 })(app);
