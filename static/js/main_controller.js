@@ -32,6 +32,7 @@ var app = angular.module('app', []);
         "Berlin-Lichtenberg",
         "Berlin-Marzah-Hellerdorf",
       ];
+      /*constituencies.push($scope.test);*/
     }
   });
 
