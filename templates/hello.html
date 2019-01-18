@@ -1,7 +1,8 @@
 <head>
   <!--<script type="text/javascript" src="/static/bower_components/angular/angular.js"></script> -->
   <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
-  <script type="text/javascript" src="/static/js/main_controller.js"></script>
+  <script type="text/javascript" src="/static/js/main_controller.js"></script> 
+  <!--<script type="text/javascript" src="/static/js/bar_controller.js"></script> -->
 
   <!-- Required meta tags -->
   <meta charset="utf-8">
@@ -10,12 +11,16 @@
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
     crossorigin="anonymous">
+
+  <!-- chart.js and angular-chart.js -->
+  <script src="../static/bower_components/chart.js/dist/Chart.min.js"></script>
+  <script src="../static/bower_components/angular-chart.js/dist/angular-chart.min.js"></script>
 </head>
 
 <body ng-app="app">
   <div class="container">
-    <div class="row">
-      <div class="col" ng-controller="main_controller">
+    <div class="row" ng-controller="main_controller">
+      <div class="col">
         <h1>Bundesland</h1>
         <ul>
           <li ng-repeat="state in states"><a href ng-click="showConstituencies()">{{state}}</a></li>
@@ -23,14 +28,61 @@
       </div>
       <div class="col">
         <h1>Wahlkreis</h1>
-        <input type="text">
-        <li ng-repeat="constituency in constituencies"><a href="#"> {{constituency}}</a></li>
+        <input type="text" ng-model="search">
+        <ul>
+          <li ng-repeat="constituency in constituencies | filter:search"><a href="#"> {{constituency}}</a></li>
+        </ul>
       </div>
       <div class="col">
         <h1>Ergebnis</h1>
-        <input type="text">
+        <h3>Wahlkreis</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                  <th>Partei</th>
+                  <th>Erststimme</th>
+                  <th>Zweitstimme</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>John</td>
+                  <td>Doe</td>
+                  <td>john@example.com</td>
+                </tr>
+                <tr>
+                  <td>Mary</td>
+                  <td>Moe</td>
+                  <td>mary@example.com</td>
+                </tr>
+                <tr>
+                  <td>July</td>
+                  <td>Dooley</td>
+                  <td>july@example.com</td>
+                </tr>
+              </tbody>
+        </table>
       </div>
     </div>
+    <div class="row">
+      <div class="col" ng-controller="bar_controller">
+          <canvas style="width: 100%" id="bar" class="chart chart-bar"
+            chart-data="data" chart-labels="labels"> chart-series="series"
+          </canvas>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col" ng-controller='firstVotes_pie_ctrl'>
+        <canvas style="width: 50%" id="pie" class="chart chart-pie"
+        chart-data="data" chart-labels="labels" chart-options="options">
+      </canvas> 
+    </div>
+    <div class="col">
+        <div class="col" ng-controller='secondVotes_pie_ctrl'>
+            <canvas style="width: 50%" id="pie" class="chart chart-pie"
+            chart-data="data" chart-labels="labels" chart-options="options">
+          </canvas>
+    </div>
   </div>
-
+  </div>
 </body>

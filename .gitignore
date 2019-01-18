@@ -94,4 +94,6 @@ btw17\.db
 
 \.vscode/settings\.json
 
+*.stackdump
+
 \.~lock\.btw17_kerg_modify\.csv#
