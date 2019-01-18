@@ -93,3 +93,5 @@ ENV/
 btw17\.db
 
 \.vscode/settings\.json
+
+*.stackdump
