@@ -1,0 +1,36 @@
+<head>
+  <!--<script type="text/javascript" src="/static/bower_components/angular/angular.js"></script> -->
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+  <script type="text/javascript" src="/static/js/main_controller.js"></script>
+
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+    crossorigin="anonymous">
+</head>
+
+<body ng-app="app">
+  <div class="container">
+    <div class="row">
+      <div class="col" ng-controller="main_controller">
+        <h1>Bundesland</h1>
+        <ul>
+          <li ng-repeat="state in states"><a href ng-click="showConstituencies()">{{state}}</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h1>Wahlkreis</h1>
+        <input type="text">
+        <li ng-repeat="constituency in constituencies"><a href="#"> {{constituency}}</a></li>
+      </div>
+      <div class="col">
+        <h1>Ergebnis</h1>
+        <input type="text">
+      </div>
+    </div>
+  </div>
+
+</body>

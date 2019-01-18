@@ -90,4 +90,8 @@ ENV/
 
 # settings.json
 .vscode/.settings.json
+btw17\.db
+
+\.vscode/settings\.json
+
 \.~lock\.btw17_kerg_modify\.csv#
