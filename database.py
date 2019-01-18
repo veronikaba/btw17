@@ -46,3 +46,14 @@ def close_db (error):
   if hasattr (g, 'sqlite_db'):g.sqlite_db.close ()
 
 #app.run(debug=True)
+class Btw(Base):
+ __tablename__ = 'btw17'
+    id = Column(Integer, primary_key=True)
+    Nr = Column(Integer)
+    Gebiet = Column(String)
+   
+ belongs_to = Column(String)
+    elective_primary = Column(Integer)
+    elective_secondary = Column(Integer)
+    voter_primary = Column(Integer)
+    voter_secondary = Column(Integer)
