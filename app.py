@@ -1,5 +1,5 @@
 from flask import Flask, render_template, send_from_directory, g, jsonify
-from sqlalchemy import Integer, Column, String
+from sqlalchemy import Integer, Column, String, Sequence
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 
 from sqlalchemy import create_engine, Table
@@ -21,7 +21,8 @@ app = Flask(__name__)
 #                    autoload=True, autoload_with=engine)
 class Btw(Base):
     __tablename__ = 'btw17'
-    Gebiet = Column(String, primary_key=True)
+    id = Column(Integer, Sequence('id_seq'), primary_key=True)
+    Gebiet = Column(String)
     Nr = Column(Integer)
     gehört_zu = Column(Integer)
     Wahlberechtigte_Erststimmen = Column(Integer)
