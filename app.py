@@ -21,8 +21,7 @@ app = Flask(__name__)
 #                    autoload=True, autoload_with=engine)
 class Btw(Base):
     __tablename__ = 'btw17'
-    id = Column(Integer, Sequence('id_seq'), primary_key=True)
-    Gebiet = Column(String)
+    Gebiet = Column(String, primary_key = True)
     Nr = Column(Integer)
     gehört_zu = Column(Integer)
     Wahlberechtigte_Erststimmen = Column(Integer)
@@ -99,7 +98,7 @@ class Btw(Base):
     Partei_der_Humanisten_Erststimmen = Column(Integer)
     Partei_der_Humanisten_Zweitstimmen = Column(Integer)
     Partei_für_Gesundheitsforschung_Erststimmen = Column(Integer)
-    Partei_für_Gesundheitsforschung_Zweistimmen = Column(Integer)
+    Partei_für_Gesundheitsforschung_Zweitstimmen = Column(Integer)
     V_Partei3_Partei_für_Veränderung_Vegetarier_und_Veganer_Erststimmen = Column(Integer)
     V_Partei3_Partei_für_Veränderung_Vegetarier_und_Veganer_Zweitstimmen = Column(Integer)
     Die_Violetten_Erststimmen = Column(Integer)
@@ -147,6 +146,12 @@ class AlchemyEncoder(json.JSONEncoder):
 def get_all():
     number = session.query(Btw).all()
     return json.dumps(number, cls=AlchemyEncoder)
+
+
+@app.route('/id', methods=['GET'])
+def get_id():
+    area = session.query(Btw).filter(Btw.gehört_zu.isnot(0)).all()
+    return json.dumps(area, cls=AlchemyEncoder)
 
 
 @app.route('/area', methods=['GET'])
