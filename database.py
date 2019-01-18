@@ -45,4 +45,4 @@ def get_db () :
 def close_db (error):
   if hasattr (g, 'sqlite_db'):g.sqlite_db.close ()
 
-app.run(debug=True)
+#app.run(debug=True)
