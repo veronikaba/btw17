@@ -5,25 +5,12 @@ var app = angular.module('app', ["chart.js"]);
   // constructor of the controller
   // variable $scope is the ViewModel
   app.controller("main_controller", function ($scope) {
-    $scope.states = [
-      "Baden-Wüttemberg",
-      "Bayern",
-      "Berlin",
-      "Brandenburg",
-      "Bremen",
-      "Hamburg",
-      "Hessen",
-      "Mecklenburg-Vorpommern",
-      "Niedersachsen",
-      "Nordreihn-Westfalen",
-      "Reihnland-Pfalz",
-      "Saarland",
-      "Sachsen",
-      "Sachsen-Anhalt",
-      "Schleswig-Holstein",
-      "Thüringen",
-    ];
-
+    $http.get('/states').success(function(response){
+      $scope.states = response.data.split('\n')
+    }).error(function(response){
+      console.log(response)
+    });
+    
     $scope.showConstituencies = function () {
       $scope.constituencies = [
         "Berlin-Charlottenburg-Wilmersdorf",
