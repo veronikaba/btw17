@@ -1,7 +1,7 @@
 from flask import Flask, render_template, send_from_directory, g, jsonify
 from sqlalchemy import Integer, Column, String, Sequence
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
-
+from sqlalchemy.pool import SingletonThreadPool
 from sqlalchemy import create_engine, Table
 from sqlalchemy.orm import sessionmaker, relationship
 import sqlite3
@@ -9,16 +9,13 @@ import logging
 import csv, json
 
 Base = declarative_base()
-engine = create_engine('sqlite:///btw17.db')
+engine = create_engine('sqlite:///btw17.db', connect_args={'check_same_thread': False})
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind = engine)
 session = Session()
 app = Flask(__name__)
 
 
-#class Btw(Base):
-#    __table__ = Table('btw', Base.metadata,
-#                    autoload=True, autoload_with=engine)
 class Btw(Base):
     __tablename__ = 'btw17'
     Gebiet = Column(String, primary_key = True)
@@ -120,9 +117,48 @@ def say_hello():
 
 def get_db () :
  if not hasattr(g,'sqlite_db'):
-  con = sqlite3.connect('btw17.db')
+  con = sqlite3.connect('btw17.db', check_same_thread=False)
   g.sqlite_db = con
  return g.sqlite_db
+
+
+#def query_db():
+@app.route('/all', methods=['GET'])
+def get_all():
+    number = session.query(Btw).all()
+    return json.dumps(number, cls=AlchemyEncoder)
+
+
+@app.route('/id', methods=['GET'])
+def get_id():
+    area = session.query(Btw).filter(Btw.gehört_zu.isnot(0)).all()
+    return json.dumps(area, cls=AlchemyEncoder)    
+
+@app.route('/area', methods=['GET'])
+def get_area():
+    area = session.query(Btw.Gebiet).all()
+    return json.dumps(area, cls=AlchemyEncoder)
+
+@app.route('/constituencies/const', methods=['GET'])
+def get_constituencie(const):
+    constituency = session.query(Btw).filter_by(Gebiet = const).first()
+    return json.dumps(constituency, cls=AlchemyEncoder)
+
+    
+@app.route('/constituencies', methods=['GET'])
+def get_constituencies():
+    constituencies = session.query(Btw).filter(Btw.gehört_zu.isnot('99')).all()
+    return json.dumps(constituencies, cls=AlchemyEncoder)
+
+@app.route('/number', methods=['GET'])
+def get_number():
+    number = session.query(Btw.Nr).all()
+    return json.dumps(number, cls=AlchemyEncoder)
+    
+
+@app.teardown_appcontext
+def close_db (error):
+  if hasattr (g, 'sqlite_db'):g.sqlite_db.close ()
 
 
 class AlchemyEncoder(json.JSONEncoder):
@@ -142,38 +178,5 @@ class AlchemyEncoder(json.JSONEncoder):
 
         return json.JSONEncoder.default(self, obj)
 
-
-#def query_db():
-@app.route('/all', methods=['GET'])
-def get_all():
-    number = session.query(Btw).all()
-    return json.dumps(number, cls=AlchemyEncoder)
-
-
-@app.route('/id', methods=['GET'])
-def get_id():
-    area = session.query(Btw).filter(Btw.gehört_zu.isnot(0)).all()
-    return json.dumps(area, cls=AlchemyEncoder)    
-
-
-@app.route('/area', methods=['GET'])
-def get_area():
-    area = session.query(Btw.Gebiet).all()
-    return json.dumps(area, cls=AlchemyEncoder)
-    
-@app.route('/constituencies', methods=['GET'])
-def get_constituencies():
-    constituencies = session.query(Btw).filter(Btw.gehört_zu.isnot('99')).all()
-    return json.dumps(constituencies, cls=AlchemyEncoder)
-
-@app.route('/number', methods=['GET'])
-def get_number():
-    number = session.query(Btw.Nr).all()
-    return json.dumps(number, cls=AlchemyEncoder)
-    
-
-@app.teardown_appcontext
-def close_db (error):
-  if hasattr (g, 'sqlite_db'):g.sqlite_db.close ()
 
 app.run(debug=True)
