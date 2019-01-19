@@ -5,20 +5,25 @@ var app = angular.module('app', ["chart.js"]);
   // constructor of the controller
   // variable $scope is the ViewModel
   app.controller("main_controller", function ($scope, $http) {
-    $http.get('/all').success(function(response){
-      $scope.states = response.data
+    $http.get('/states').success(function(response){
+      var response = JSON.parse(response)
+      var states = []
+      for (var i = 0; i < response.length; i++){
+        states[i] = response[i][0];
+      }
+      $scope.states = states
     }).error(function(response){
       console.log(response)
     });
     
-    $scope.showConstituencies = function () {
-      $scope.constituencies = [
-        "Berlin-Charlottenburg-Wilmersdorf",
-        "Berlin-Friedrichshein-Kreuzberg-Prenzlauerberg Ost",
-        "Berlin-Lichtenberg",
-        "Berlin-Marzah-Hellerdorf",
-      ];
-      /*constituencies.push($scope.test);*/
+    $scope.showConstituencies = function (state) {
+      console.log($scope.state)
+      //console.log($scope.state)
+      /*$http.get('/constituencies',{params: $scope.states[1]}).success(function(response){
+        $scope.constituencies = response
+      }).error(function(response){
+        console.log(response)
+      });*/
     }
   });
 

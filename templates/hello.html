@@ -22,8 +22,8 @@
     <div class="row" ng-controller="main_controller">
       <div class="col">
         <h1>Bundesland</h1>
-        <ul>
-          <li ng-repeat="state in states"><a href ng-click="showConstituencies()">{{state}}</a></li>
+        <ul ng-model="state">
+          <li ng-repeat="state in states"><a href ng-click="showConstituencies(state)">{{state}}</a></li>
         </ul>
       </div>
       <div class="col">
