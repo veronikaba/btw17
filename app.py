@@ -126,18 +126,18 @@ def get_db () :
 @app.route('/all', methods=['GET'])
 def get_all():
     number = session.query(Btw).all()
-    return json.dumps(number, cls=AlchemyEncoder)
+    return jsonify(json.dumps(number, cls=AlchemyEncoder))
 
 
 @app.route('/id', methods=['GET'])
 def get_id():
     area = session.query(Btw.Gebiet).filter(Btw.Gebiet).all()
-    return json.dumps(area, cls=AlchemyEncoder)    
+    return jsonify(json.dumps(area, cls=AlchemyEncoder))   
 
 @app.route('/area', methods=['GET'])
 def get_area():
     area = session.query(Btw.Gebiet).all()
-    return json.dumps(area, cls=AlchemyEncoder)
+    return jsonify(json.dumps(area, cls=AlchemyEncoder))
 
 
 @app.route('/states', methods=['GET'])
@@ -148,18 +148,13 @@ def get_states():
 @app.route('/constituencies/constituency/<const>', methods=['GET'])
 def get_constituency(const):
     constituency = session.query(Btw).filter(Btw.gehört_zu == const).first()
-    return json.dumps(constituency, cls=AlchemyEncoder)
+    return jsonify(json.dumps(constituency, cls=AlchemyEncoder))
 
     
 @app.route('/constituencies/<state>', methods=['GET'])
 def get_constituencies(state):
     constituencies = session.query(Btw).filter_by(gehört_zu = state).all()
-    return json.dumps(constituencies, cls=AlchemyEncoder)
-
-@app.route('/number', methods=['GET'])
-def get_number():
-    number = session.query(Btw.Nr).filter(Btw.Nr.isnot('')).all()
-    return json.dumps(number, cls=AlchemyEncoder)
+    return jsonify(json.dumps(constituencies, cls=AlchemyEncoder))
     
 
 @app.teardown_appcontext
