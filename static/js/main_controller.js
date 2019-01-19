@@ -31,6 +31,13 @@ var app = angular.module('app', ["chart.js"]);
     }
     $scope.showDetails = function (constituency) {
       console.log(constituency)
+      $http.get('/constituency/'+ constituency).success(function(response){
+        var response = JSON.parse(response)
+        console.log(response)
+        $scope.parties = response
+        //values = Object.values(response)
+        //console.log(keys)
+      })
     }
   });
 

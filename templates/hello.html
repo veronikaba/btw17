@@ -45,10 +45,10 @@
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td ng-repeat="party in parties">{{party}}</td>
-                  <td ng-repeat="firstVote in firstVotes">{{firstVotes}</td>
-                  <td ng-repeat="secondVote in secondVotes">{{secondVotes}}</td>
+                <tr ng-repeat= " x in parties">
+                  <td>{{x}}</td>
+                  <td>{{x.firstVotes}}</td>
+                  <td>{{x.secondVotes}}</td>
                 </tr>
               </tbody>
         </table>
