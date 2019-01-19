@@ -17,13 +17,17 @@ var app = angular.module('app', ["chart.js"]);
     });
     
     $scope.showConstituencies = function (state) {
-      console.log($scope.state)
-      //console.log($scope.state)
-      /*$http.get('/constituencies',{params: $scope.states[1]}).success(function(response){
-        $scope.constituencies = response
+      console.log(state)
+      $http.get('/constituencies/'+ state).success(function(response){
+        var response = JSON.parse(response)
+        var constituencies = []
+        for (var i = 0; i < response.length; i++){
+          constituencies[i] = response[i].serializable.Gebiet;
+        }
+        $scope.constituencies = constituencies
       }).error(function(response){
         console.log(response)
-      });*/
+      });
     }
   });
 
