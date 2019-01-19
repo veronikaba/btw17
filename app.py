@@ -110,6 +110,16 @@ class Btw(Base):
     Neue_Liberale_Die_Sozialliberalen_Zweitstimmen = Column(Integer)
     UNABHÄNGIGE_für_bürgernahe_Demokratie = Column(Integer)
 
+    @property
+    def serializable(self):
+        return{
+            'Nr'    : self.Nr,
+            'Gebiet': self.Gebiet,    
+            'gehört zu' : self.gehört_zu,
+            'Wahlberechtigte Erststimmen' : self.Wahlberechtigte_Erststimmen
+    }
+
+
 
 @app.route('/')
 def say_hello():
@@ -129,11 +139,6 @@ def get_all():
     return jsonify(json.dumps(number, cls=AlchemyEncoder))
 
 
-@app.route('/id', methods=['GET'])
-def get_id():
-    area = session.query(Btw.Gebiet).filter(Btw.Gebiet).all()
-    return jsonify(json.dumps(area, cls=AlchemyEncoder))   
-
 @app.route('/area', methods=['GET'])
 def get_area():
     area = session.query(Btw.Gebiet).all()
@@ -150,6 +155,13 @@ def get_constituency(const):
     constituency = session.query(Btw).filter(Btw.gehört_zu == const).first()
     return jsonify(json.dumps(constituency, cls=AlchemyEncoder))
 
+@app.route('/constintuencies/<name>', methods=['GET'])
+def get_state_by_name(name):
+    state = session.query(Btw.Nr).filter(Btw.Gebiet.contains(name)).filter(Btw.gehört_zu.contains('99')).first()
+    logging.error(state)
+    constintuencies = session.query(Btw).filter_by(gehört_zu = state[0]).all()
+    return jsonify(json.dumps(constintuencies, cls=AlchemyEncoder))
+
     
 @app.route('/constituencies/<state>', methods=['GET'])
 def get_constituencies(state):
@@ -157,9 +169,16 @@ def get_constituencies(state):
     return jsonify(json.dumps(constituencies, cls=AlchemyEncoder))
     
 
+@app.route('/test', methods=['GET'])
+def get_test():
+    constituencies = session.query(Btw.Nr, Btw.Gebiet, Btw.gehört_zu, Btw.Wahlberechtigte_Erststimmen).filter_by(gehört_zu = '99').all()
+    return jsonify(json.dumps(constituencies, cls=AlchemyEncoder))
+        
+
 @app.teardown_appcontext
 def close_db (error):
   if hasattr (g, 'sqlite_db'):g.sqlite_db.close ()
+
 
 
 class AlchemyEncoder(json.JSONEncoder):
@@ -170,7 +189,7 @@ class AlchemyEncoder(json.JSONEncoder):
             for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
                 data = obj.__getattribute__(field)
                 try:
-                    json.dumps(data).encode('utf16') # this will fail on non-encodable values, like other classes
+                    json.dumps(data).encode('utf8') # this will fail on non-encodable values, like other classes
                     fields[field] = data
                 except TypeError:
                     fields[field] = None
@@ -179,5 +198,5 @@ class AlchemyEncoder(json.JSONEncoder):
 
         return json.JSONEncoder.default(self, obj)
 
-
+            
 app.run(debug=True)
