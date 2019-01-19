@@ -29,6 +29,9 @@ var app = angular.module('app', ["chart.js"]);
         console.log(response)
       });
     }
+    $scope.showDetails = function (constituency) {
+      console.log(constituency)
+    }
   });
 
   app.controller('bar_controller', function($scope){

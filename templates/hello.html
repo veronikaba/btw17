@@ -29,8 +29,8 @@
       <div class="col">
         <h1>Wahlkreis</h1>
         <input type="text" ng-model="search">
-        <ul>
-          <li ng-repeat="constituency in constituencies | filter:search"><a href="#"> {{constituency}}</a></li>
+        <ul ng-model="constituency">
+          <li ng-repeat="constituency in constituencies | filter:search"><a href ng-click="showDetails(constituency)"> {{constituency}}</a></li>
         </ul>
       </div>
       <div class="col">
@@ -46,19 +46,9 @@
               </thead>
               <tbody>
                 <tr>
-                  <td>John</td>
-                  <td>Doe</td>
-                  <td>john@example.com</td>
-                </tr>
-                <tr>
-                  <td>Mary</td>
-                  <td>Moe</td>
-                  <td>mary@example.com</td>
-                </tr>
-                <tr>
-                  <td>July</td>
-                  <td>Dooley</td>
-                  <td>july@example.com</td>
+                  <td ng-repeat="party in parties">{{party}}</td>
+                  <td ng-repeat="firstVote in firstVotes">{{firstVotes}</td>
+                  <td ng-repeat="secondVote in secondVotes">{{secondVotes}}</td>
                 </tr>
               </tbody>
         </table>
