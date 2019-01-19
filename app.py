@@ -150,7 +150,7 @@ def get_states():
     area = session.query(Btw.Gebiet, Btw.Nr).filter(Btw.gehört_zu.contains('99')).all()
     return jsonify(json.dumps(area, cls=AlchemyEncoder))
 
-@app.route('/constituencies/constituency/<const>', methods=['GET'])
+@app.route('/constituency/<const>', methods=['GET'])
 def get_constituency(const):
     constituency = session.query(Btw).filter(Btw.Gebiet == const).first()
     return jsonify(json.dumps(constituency, cls=AlchemyEncoder))
