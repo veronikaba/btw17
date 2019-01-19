@@ -143,7 +143,7 @@ def get_area():
 @app.route('/states', methods=['GET'])
 def get_states():
     area = session.query(Btw.Gebiet, Btw.Nr).filter(Btw.gehört_zu.contains('99')).all()
-    return json.dumps(area, cls=AlchemyEncoder)
+    return jsonify(json.dumps(area, cls=AlchemyEncoder))
 
 @app.route('/constituencies/constituency/<const>', methods=['GET'])
 def get_constituency(const):
@@ -175,7 +175,7 @@ class AlchemyEncoder(json.JSONEncoder):
             for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
                 data = obj.__getattribute__(field)
                 try:
-                    json.dumps(data) # this will fail on non-encodable values, like other classes
+                    json.dumps(data).encode('utf16') # this will fail on non-encodable values, like other classes
                     fields[field] = data
                 except TypeError:
                     fields[field] = None
