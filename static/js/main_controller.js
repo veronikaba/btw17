@@ -16,14 +16,14 @@ var app = angular.module('app', ["chart.js"]);
       console.log(response)
     });
     
-    $scope.showConstituencies = function (state) {
-      console.log($scope.state)
-      //console.log($scope.state)
-      /*$http.get('/constituencies',{params: $scope.states[1]}).success(function(response){
+    $scope.showConstituencies = function () {
+     // console.log($scope.states[0])
+      var param = $scope.states[0]
+      $http.get('/constituencies',{params:{param}}).success(function(response){
         $scope.constituencies = response
       }).error(function(response){
         console.log(response)
-      });*/
+      });
     }
   });
 

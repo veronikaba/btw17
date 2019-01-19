@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_from_directory, g, jsonify
+from flask import Flask, render_template, send_from_directory, g, jsonify, request
 from sqlalchemy import Integer, Column, String, Sequence
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 from sqlalchemy.pool import SingletonThreadPool
@@ -150,21 +150,25 @@ def get_states():
     area = session.query(Btw.Gebiet, Btw.Nr).filter(Btw.gehört_zu.contains('99')).all()
     return jsonify(json.dumps(area, cls=AlchemyEncoder))
 
-@app.route('/constituencies/constituency/<const>', methods=['GET'])
-def get_constituency(const):
+@app.route('/constituencies/constituency', methods=['GET'])
+def get_constituency():
+    const = request.args.get('param')
     constituency = session.query(Btw).filter(Btw.gehört_zu == const).first()
     return jsonify(json.dumps(constituency, cls=AlchemyEncoder))
 
-@app.route('/constituencies/<name>', methods=['GET'])
-def get_state_by_name(name):
-    state = session.query(Btw.Nr).filter(Btw.Gebiet.contains(name)).filter(Btw.gehört_zu.contains('99')).first()
-    logging.error(state)
+@app.route('/constituencies', methods=['GET'])
+def get_state_by_name():
+    logging.error('CONSTITUENCIES!!!!!!!!!!!!!!!!!!!!')
+    name = request.args.get('param')
+    state = session.query(Btw.Nr).filter(Btw.Gebiet.contains(name)).filter(Btw.gehört_zu ==('99')).first()
     constintuencies = session.query(Btw).filter_by(gehört_zu = state[0]).all()
+    logging.error('finished Querying!!!!!!!!!!!!!')
     return jsonify(json.dumps(constintuencies, cls=AlchemyEncoder))
 
     
-@app.route('/constituencies/nr/<state>', methods=['GET'])
-def get_constituencies(state):
+@app.route('/constituencies/nr', methods=['GET'])
+def get_constituencies():
+    state = request.args.get('param')
     constituencies = session.query(Btw).filter_by(gehört_zu = state).all()
     return jsonify(json.dumps(constituencies, cls=AlchemyEncoder))
     
