@@ -155,7 +155,7 @@ def get_constituency(const):
     constituency = session.query(Btw).filter(Btw.gehört_zu == const).first()
     return jsonify(json.dumps(constituency, cls=AlchemyEncoder))
 
-@app.route('/constintuencies/<name>', methods=['GET'])
+@app.route('/constituencies/<name>', methods=['GET'])
 def get_state_by_name(name):
     state = session.query(Btw.Nr).filter(Btw.Gebiet.contains(name)).filter(Btw.gehört_zu.contains('99')).first()
     logging.error(state)
@@ -163,7 +163,7 @@ def get_state_by_name(name):
     return jsonify(json.dumps(constintuencies, cls=AlchemyEncoder))
 
     
-@app.route('/constituencies/<state>', methods=['GET'])
+@app.route('/constituencies/nr/<state>', methods=['GET'])
 def get_constituencies(state):
     constituencies = session.query(Btw).filter_by(gehört_zu = state).all()
     return jsonify(json.dumps(constituencies, cls=AlchemyEncoder))
