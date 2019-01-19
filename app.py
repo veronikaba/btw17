@@ -115,8 +115,8 @@ class Btw(Base):
         return{
             'Nr'    : self.Nr,
             'Gebiet': self.Gebiet,    
-            'gehört zu' : self.gehört_zu,
-            'Wahlberechtigte Erststimmen' : self.Wahlberechtigte_Erststimmen
+            'gehört_zu' : self.gehört_zu,
+            'Wahlberechtigte_Erststimmen' : self.Wahlberechtigte_Erststimmen
     }
 
 
@@ -152,8 +152,9 @@ def get_states():
 
 @app.route('/constituencies/constituency/<const>', methods=['GET'])
 def get_constituency(const):
-    constituency = session.query(Btw).filter(Btw.gehört_zu == const).first()
+    constituency = session.query(Btw).filter(Btw.Gebiet == const).first()
     return jsonify(json.dumps(constituency, cls=AlchemyEncoder))
+
 
 @app.route('/constituencies/<name>', methods=['GET'])
 def get_state_by_name(name):
