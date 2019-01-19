@@ -124,7 +124,7 @@ def get_db () :
   g.sqlite_db = con
  return g.sqlite_db
 
-#def query_db():
+
 class AlchemyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj.__class__, DeclarativeMeta):
@@ -142,6 +142,8 @@ class AlchemyEncoder(json.JSONEncoder):
 
         return json.JSONEncoder.default(self, obj)
 
+
+#def query_db():
 @app.route('/all', methods=['GET'])
 def get_all():
     number = session.query(Btw).all()
@@ -151,7 +153,7 @@ def get_all():
 @app.route('/id', methods=['GET'])
 def get_id():
     area = session.query(Btw).filter(Btw.gehört_zu.isnot(0)).all()
-    return json.dumps(area, cls=AlchemyEncoder)
+    return json.dumps(area, cls=AlchemyEncoder)    
 
 
 @app.route('/area', methods=['GET'])
@@ -159,6 +161,10 @@ def get_area():
     area = session.query(Btw.Gebiet).all()
     return json.dumps(area, cls=AlchemyEncoder)
     
+@app.route('/constituencies', methods=['GET'])
+def get_constituencies():
+    constituencies = session.query(Btw).filter(Btw.gehört_zu.isnot('99')).all()
+    return json.dumps(constituencies, cls=AlchemyEncoder)
 
 @app.route('/number', methods=['GET'])
 def get_number():
