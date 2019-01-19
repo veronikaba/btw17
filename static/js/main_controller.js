@@ -4,9 +4,9 @@ var app = angular.module('app', ["chart.js"]);
 
   // constructor of the controller
   // variable $scope is the ViewModel
-  app.controller("main_controller", function ($scope) {
-    $http.get('/states').success(function(response){
-      $scope.states = response.data.split('\n')
+  app.controller("main_controller", function ($scope, $http) {
+    $http.get('/all').success(function(response){
+      $scope.states = response.data
     }).error(function(response){
       console.log(response)
     });
