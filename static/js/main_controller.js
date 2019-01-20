@@ -41,7 +41,7 @@ var app = angular.module('app', ["chart.js"]);
         var  secondary_votes = []
         var oldString = '';
         for(var k in response){
-          if(k !== 'Gebiet' && k !== 'Nr' && k !== 'serializable' && k!== 'gehört_zu'){
+          if(k !== 'Gebiet' && k !== 'Nr' && k !== 'serializable' && k !== 'gehört_zu'){
           var tempString = k.replace(/_/g, ' ')
           tempString = tempString.replace('Erststimmen', "")
           tempString = tempString.replace('Zweitstimmen', "")
@@ -49,22 +49,17 @@ var app = angular.module('app', ["chart.js"]);
            keys.push(tempString);
             oldString = tempString  
           }
-          if(k.includes('Erststimmen')){
-            console.log('Erststimmen: ' + (response[k]))
-            primary_votes.push(response[k])
-          }
-          if(k.includes('Zweitstimmen')){
-            secondary_votes.push(response[k])
-          }
+          primary_votes.push(response[k])
          }
         }
         var i=0;
-        console.log('key lenght: ' + keys.length)
-        console.log('prim lenght: ' + primary_votes.length)
-        console.log('sec lenght: ' + secondary_votes.length)
+        var j =0
+        console.log('party lenght' + keys.length)
+        console.log('votes lenght' + primary_votes.length)
         while (i < keys.length){
-        var party = {party:keys[i], firstVotes:primary_votes[i], secondVotes: secondary_votes[i] };
+        var party = {party:keys[i], firstVotes:primary_votes[j], secondVotes: primary_votes[j+1] };
          i = i+1 
+         j = j+2
          parties.push(party)
         }
         $scope.parties = parties

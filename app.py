@@ -29,7 +29,6 @@ class Btw(Base):
     Ungültige_Zweitstimmen = Column(Integer)
     Gültige_Erststimmen = Column(Integer)
     Gültige_Zweitstimmen = Column(Integer)
-    Gültige_Erststimmen = Column(Integer)
     Christlich_Demokratische_Union_Deutschlands_Erststimmen = Column(Integer)
     Christlich_Demokratische_Union_Deutschlands_Zweitstimmen = Column(Integer)
     Sozialdemokratische_Partei_Deutschlands_Erststimmen = Column(Integer)
@@ -81,7 +80,9 @@ class Btw(Base):
     Bündnis_Grundeinkommen_Erststimmen = Column(Integer)
     Bündnis_Grundeinkommen_Zweitstimmen = Column(Integer)
     DEMOKRATIE_IN_BEWEGUNG_Erststimmen = Column(Integer)
+    DEMOKRATIE_IN_BEWEGUNG_Zweitstimmen = Column(Integer)
     Deutsche_Kommunistische_Partei_Erststimmen = Column(Integer)
+    Deutsche_Kommunistische_Partei_Zweitstimmen = Column(Integer)
     Deutsche_Mitte_Erststimmen = Column(Integer)
     Deutsche_Mitte_Zweitstimmen = Column(Integer)
     Die_Grauen_Für_alle_Generationen_Erststimmen = Column(Integer)
@@ -108,7 +109,6 @@ class Btw(Base):
     Mieterpartei_Zweitstimmen = Column(Integer)
     Neue_Liberale_Die_Sozialliberalen_Erststimmen = Column(Integer)
     Neue_Liberale_Die_Sozialliberalen_Zweitstimmen = Column(Integer)
-    UNABHÄNGIGE_für_bürgernahe_Demokratie = Column(Integer)
 
     @property
     def serializable(self):
@@ -116,7 +116,23 @@ class Btw(Base):
             'Nr'    : self.Nr,
             'Gebiet': self.Gebiet,    
             'gehört_zu' : self.gehört_zu,
-            'Wahlberechtigte_Erststimmen' : self.Wahlberechtigte_Erststimmen
+            'Wahlberechtigte' : {
+                'Erststimmen': self.Wahlberechtigte_Erststimmen,
+                'Zweitstimmen': self.Wahlberechtigte_Zweitstimmen
+            },
+            'Wähler': {
+                'Erststimmen': self.Wähler_Erststimmen,
+                'Zweitstimmen': self.Wähler_Zweitstimmen
+            },
+            'Ungültige': {
+                'Erststimmen': self.Ungültige_Erststimmen,
+                'Zweitstimmen': self.Ungültige_Zweitstimmen
+            },
+            'Gültige': {
+                'Erststimmen': self.Gültige_Erststimmen,
+                'Zweitstimmen': self.Gültige_Zweitstimmen
+            }
+
     }
 
 
