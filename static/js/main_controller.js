@@ -3,32 +3,25 @@ var app = angular.module('app', ["chart.js"]);
   // depends on. In this case: none => empty array
 
 //service to pass data between controller
-  app.service('partyService', function() {
+  app.service('PartyService', function() {
     var partyList = [];
   
     var addParty = function(newObj) {
-        productList.push(newObj);
+      partyList.push(newObj);
     };
 
-    var setParties = function([]){
-      productList = []
+    this.setParties = function(newObj){
+      partyList = newObj
     }
   
-    var getParties = function(){
+    this.getParties = function(){
         return partyList;
     };
-  
-    return {
-      addParty: addParty,
-      setParties: setParties,
-      getParties: getParties
-    };
-  
   });
 
   // constructor of the controller
   // variable $scope is the ViewModel
-  app.controller("main_controller", function ($scope, $http) {
+  app.controller("main_controller", function ($scope, PartyService, $http) {
     $http.get('/states').success(function(response){
       var response = JSON.parse(response)
       var states = []
@@ -53,7 +46,7 @@ var app = angular.module('app', ["chart.js"]);
         console.log(response)
       });
     }
-    $scope.showDetails = function (constituency, partyService) {
+    $scope.showDetails = function (constituency) {
     
       $http.get('/constituency/'+ constituency).success(function(response){
         var response = JSON.parse(response)
@@ -83,9 +76,8 @@ var app = angular.module('app', ["chart.js"]);
          parties.push(party)
         }
         $scope.parties = parties
-        $scope.partyService = function(parties){
-            partyService.setParties(parties)
-        }
+        PartyService.setParties(parties)
+        console.log('Party content: ' + JSON.stringify(PartyService.getParties()))
       })
     }
   });
@@ -107,11 +99,11 @@ var app = angular.module('app', ["chart.js"]);
     ];
   });
 
-  app.controller('firstVotes_pie_ctrl', function($scope, partyService){
+  app.controller('firstVotes_pie_ctrl', function($scope, PartyService){
     var parties = [];
     var primary = []
-      // now get party information... 
-    var p = partyService.getParties()
+    var p = PartyService.getParties()
+    console.log('parties ' + p)
     for( var i in p){
         parties.push(i.party)
         primary.push(i.firstVotes)
