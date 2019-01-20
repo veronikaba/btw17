@@ -36,9 +36,17 @@ var app = angular.module('app', ["chart.js"]);
         console.log('show Details ' + constituency)
         console.log(response)
         var keys = [];
-        for(var k in response){
-          if(k !== 'Gebiet' && k !== 'Nr' && k !== 'serializable' && k!== 'gehört_zu')
-          keys.push(k.replace(/_/g, ' '));
+        var oldString = '';
+        for(var k in response){ 
+          if(k !== 'Gebiet' && k !== 'Nr' && k !== 'serializable' && k!== 'gehört_zu'){
+          var tempString = k.replace(/_/g, ' ')
+          tempString = tempString.replace('Erststimmen', "")
+          tempString = tempString.replace('Zweitstimmen', "")
+          if(oldString != tempString){
+            keys.push(tempString);
+            oldString = tempString  
+          }
+          }
         } 
         $scope.parties = keys
         //values = Object.values(response)
