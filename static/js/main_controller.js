@@ -35,20 +35,39 @@ var app = angular.module('app', ["chart.js"]);
         var response = JSON.parse(response)
         console.log('show Details ' + constituency)
         console.log(response)
+        var parties = []
         var keys = [];
+        var  primary_votes = []
+        var  secondary_votes = []
         var oldString = '';
-        for(var k in response){ 
+        for(var k in response){
           if(k !== 'Gebiet' && k !== 'Nr' && k !== 'serializable' && k!== 'gehört_zu'){
           var tempString = k.replace(/_/g, ' ')
           tempString = tempString.replace('Erststimmen', "")
           tempString = tempString.replace('Zweitstimmen', "")
           if(oldString != tempString){
-            keys.push(tempString);
+           keys.push(tempString);
             oldString = tempString  
           }
+          if(k.includes('Erststimmen')){
+            console.log('Erststimmen: ' + (response[k]))
+            primary_votes.push(response[k])
           }
-        } 
-        $scope.parties = keys
+          if(k.includes('Zweitstimmen')){
+            secondary_votes.push(response[k])
+          }
+         }
+        }
+        var i=0;
+        console.log('key lenght: ' + keys.length)
+        console.log('prim lenght: ' + primary_votes.length)
+        console.log('sec lenght: ' + secondary_votes.length)
+        while (i < keys.length){
+        var party = {party:keys[i], firstVotes:primary_votes[i], secondVotes: secondary_votes[i] };
+         i = i+1 
+         parties.push(party)
+        }
+        $scope.parties = parties
         //values = Object.values(response)
         //console.log(keys)
       })
