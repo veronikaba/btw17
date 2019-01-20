@@ -60,7 +60,7 @@ class Btw(Base):
     Partei_der_Vernunft_Erststimmen = Column(Integer)
     Partei_der_Vernunft_Zweitstimmen = Column(Integer)
     Marxistisch_Leninistische_Partei_Deutschlands_Erststimmen = Column(Integer)
-    Marxistisch_Leninistische_Partei_Deutschlands_ZWeitstimmen = Column(Integer)
+    Marxistisch_Leninistische_Partei_Deutschlands_Zweitstimmen = Column(Integer)
     Bürgerrechtsbewegung_Solidarität_Erststimmen = Column(Integer)
     Bürgerrechtsbewegung_Solidarität_Zweitstimmen = Column(Integer)
     Sozialistische_Gleichheitspartei_Erststimmen = Column(Integer)
