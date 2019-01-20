@@ -36,7 +36,10 @@ var app = angular.module('app', ["chart.js"]);
         console.log('show Details ' + constituency)
         console.log(response)
         var keys = [];
-        for(var k in response) keys.push(k);
+        for(var k in response){
+          if(k !== 'Gebiet' && k !== 'Nr' && k !== 'serializable' && k!== 'gehört_zu')
+          keys.push(k.replace(/_/g, ' '));
+        } 
         $scope.parties = keys
         //values = Object.values(response)
         //console.log(keys)
