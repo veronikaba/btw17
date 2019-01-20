@@ -2,6 +2,30 @@ var app = angular.module('app', ["chart.js"]);
   // the array contains modules that this module
   // depends on. In this case: none => empty array
 
+//service to pass data between controller
+  app.service('partyService', function() {
+    var partyList = [];
+  
+    var addParty = function(newObj) {
+        productList.push(newObj);
+    };
+
+    var setParties = function([]){
+      productList = []
+    }
+  
+    var getParties = function(){
+        return partyList;
+    };
+  
+    return {
+      addParty: addParty,
+      setParties: setParties,
+      getParties: getParties
+    };
+  
+  });
+
   // constructor of the controller
   // variable $scope is the ViewModel
   app.controller("main_controller", function ($scope, $http) {
@@ -29,7 +53,7 @@ var app = angular.module('app', ["chart.js"]);
         console.log(response)
       });
     }
-    $scope.showDetails = function (constituency) {
+    $scope.showDetails = function (constituency, partyService) {
     
       $http.get('/constituency/'+ constituency).success(function(response){
         var response = JSON.parse(response)
@@ -59,6 +83,9 @@ var app = angular.module('app', ["chart.js"]);
          parties.push(party)
         }
         $scope.parties = parties
+        $scope.partyService = function(parties){
+            partyService.setParties(parties)
+        }
       })
     }
   });
@@ -80,14 +107,14 @@ var app = angular.module('app', ["chart.js"]);
     ];
   });
 
-  app.controller('firstVotes_pie_ctrl', function($scope){
+  app.controller('firstVotes_pie_ctrl', function($scope, partyService){
     var parties = [];
     var primary = []
-    var p =$scope.parties
-    // now get party information... 
-    for( var i in $scope.parties){
-        parties.push(parties[i].party)
-        primary.push(parties[i].firstVotes)
+      // now get party information... 
+    var p = partyService.getParties()
+    for( var i in p){
+        parties.push(i.party)
+        primary.push(i.firstVotes)
     }
     $scope.labels = parties;
     $scope.data = [
