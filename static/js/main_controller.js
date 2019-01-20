@@ -33,12 +33,9 @@ var app = angular.module('app', ["chart.js"]);
     
       $http.get('/constituency/'+ constituency).success(function(response){
         var response = JSON.parse(response)
-        console.log('show Details ' + constituency)
-        console.log(response)
         var parties = []
         var keys = [];
-        var  primary_votes = []
-        var  secondary_votes = []
+        var votes = []
         var oldString = '';
         for(var k in response){
           if(k !== 'Gebiet' && k !== 'Nr' && k !== 'serializable' && k !== 'gehört_zu'){
@@ -49,29 +46,34 @@ var app = angular.module('app', ["chart.js"]);
            keys.push(tempString);
             oldString = tempString  
           }
-          primary_votes.push(response[k])
+          votes.push(response[k])
          }
         }
         var i=0;
         var j =0
-        console.log('party lenght' + keys.length)
-        console.log('votes lenght' + primary_votes.length)
         while (i < keys.length){
-        var party = {party:keys[i], firstVotes:primary_votes[j], secondVotes: primary_votes[j+1] };
+        // every vote votes on pos j %2 =0 is first vote else second
+        var party = {party:keys[i], firstVotes:votes[j], secondVotes: votes[j+1] };
          i = i+1 
          j = j+2
          parties.push(party)
         }
         $scope.parties = parties
-        //values = Object.values(response)
-        //console.log(keys)
       })
     }
   });
 
   app.controller('bar_controller', function($scope){
-    $scope.labels = ['2006', '2007', '2008', '2009', '2010', '2011', '2012'];
-  
+    var parties = [];
+    var primary = []
+    var secondary = []
+    // now get party information... 
+    for( var i in $scope.parties){
+        parties.push(parties[i].party)
+        primary.push(parties[i].firstVotes)
+        secondary.push(parties[i].secondVotes)
+    }
+    $scope.labels = parties
     $scope.data = [
       [65, 59, 80, 81, 56, 55, 40],
       [28, 48, 40, 19, 86, 27, 90]
@@ -79,9 +81,17 @@ var app = angular.module('app', ["chart.js"]);
   });
 
   app.controller('firstVotes_pie_ctrl', function($scope){
-    $scope.labels = ['2006', '2007', '2008', '2009', '2010', '2011', '2012'];
+    var parties = [];
+    var primary = []
+    var p =$scope.parties
+    // now get party information... 
+    for( var i in $scope.parties){
+        parties.push(parties[i].party)
+        primary.push(parties[i].firstVotes)
+    }
+    $scope.labels = parties;
     $scope.data = [
-      [28, 48, 40, 19, 86, 27, 90]
+      [primary]
     ];
   });
 
