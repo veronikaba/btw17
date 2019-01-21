@@ -1,7 +1,13 @@
 var app = angular.module('app', ["chart.js"]);
   // the array contains modules that this module
   // depends on. In this case: none => empty array
-
+  function compare(a,b) {
+    if ((a.firstVotes + a.secondVotes) > (b.firstVotes + b.secondVotes))
+      return -1;
+    if ((a.firstVotes + a.secondVotes) < (b.firstVotes + b.secondVotes))
+      return 1;
+    return 0;
+  }
 
   // constructor of the controller
   // variable $scope is the ViewModel
@@ -38,7 +44,7 @@ var app = angular.module('app', ["chart.js"]);
         var votes = []
         var oldString = '';
         for(var k in response){
-          if(k !== 'Gebiet' && k !== 'Nr' && k !== 'serializable' && k !== 'gehört_zu'){
+          if(k !== 'Gebiet' && k !== 'Nr' && k !== 'serializable' && k !== 'gehört_zu' ){
           var tempString = k.replace(/_/g, ' ')
           tempString = tempString.replace('Erststimmen', "")
           tempString = tempString.replace('Zweitstimmen', "")
@@ -53,11 +59,20 @@ var app = angular.module('app', ["chart.js"]);
         var j =0
         while (i < keys.length){
         // every vote votes on pos j %2 =0 is first vote else second
-        var party = {party:keys[i], firstVotes:votes[j], secondVotes: votes[j+1] };
+        var v1 =0;
+        var v2 =0;
+        if(votes[j]){
+          v1 = parseInt(votes[j]);
+        }
+        if(votes[j+1]){
+          v2 = parseInt(votes[j+1]);
+        }
+        var party = {party:keys[i], firstVotes:v1, secondVotes: v2 };
          i = i+1 
          j = j+2
          parties.push(party)
         }
+        parties = parties.sort(compare)
         $scope.parties = parties
         $rootScope.$broadcast('partyData', parties)
       })
@@ -71,21 +86,16 @@ var app = angular.module('app', ["chart.js"]);
     // now get party information... 
     $rootScope.$on('partyData', function(event, data) {
       data.forEach(function(entry){
+      if(entry.party !== "Wahlberechtigte " && entry.party !== "Wähler " && entry.party !=='Ungültige ' && entry.party !== "Gültige " ){
        parties.push(entry.party)
-       var j= "" + JSON.stringify(entry.firstVotes) 
-       if(entry.firstVotes){
-         j = parseInt(entry.firstVotes)
-       }else{
-         j =0
-       }
-       primary.push(j)
+       primary.push(entry.firstVotes)
        if(entry.secondVotes){
         j = parseInt(entry.secondVotes)
       }else{
         j =0
       }
       secondary.push(j)
-      })
+      }})
      $scope.labels = parties;
      $scope.data = [
        primary, secondary
@@ -98,16 +108,10 @@ var app = angular.module('app', ["chart.js"]);
     var primary = []
     $rootScope.$on('partyData', function(event, data) {
      data.forEach(function(entry){
+      if( entry.party !== "Wahlberechtigte " && entry.party !== "Wähler " && entry.party !=='Ungültige ' && entry.party !== "Gültige " ){
       parties.push(entry.party)
-      var j= "" + JSON.stringify(entry.firstVotes) 
-      if(entry.firstVotes){
-        j = parseInt(entry.firstVotes)
-      }else{
-        j =0
-      }
-      primary.push(j)
-     })
-     console.log('parties' + parties)
+      primary.push(entry.firstVotes)
+     }})
     $scope.labels = parties;
     $scope.data = [
       primary
@@ -120,16 +124,10 @@ var app = angular.module('app', ["chart.js"]);
     var secondary = []
     $rootScope.$on('partyData', function(event, data) {
      data.forEach(function(entry){
-      parties.push(entry.party)
-      var j= "" + JSON.stringify(entry.firstVotes) 
-      if(entry.firstVotes){
-        j = parseInt(entry.secondVotes)
-      }else{
-        j =0
-      }
-      secondary.push(j)
-     })
-
+      if(entry.party !== "Wahlberechtigte " && entry.party !== "Wähler " && entry.party !=='Ungültige ' && entry.party !== "Gültige " ){
+        parties.push(entry.party)
+        secondary.push(entry.firstVotes)
+     }})
     $scope.labels = parties;
     $scope.data = [
       secondary
