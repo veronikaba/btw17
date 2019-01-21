@@ -132,7 +132,6 @@ class Btw(Base):
                 'Erststimmen': self.Gültige_Erststimmen,
                 'Zweitstimmen': self.Gültige_Zweitstimmen
             }
-
     }
 
 

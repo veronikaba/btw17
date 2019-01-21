@@ -1,10 +1,17 @@
 var app = angular.module('app', ["chart.js"]);
   // the array contains modules that this module
   // depends on. In this case: none => empty array
+  function compare(a,b) {
+    if ((a.firstVotes + a.secondVotes) > (b.firstVotes + b.secondVotes))
+      return -1;
+    if ((a.firstVotes + a.secondVotes) < (b.firstVotes + b.secondVotes))
+      return 1;
+    return 0;
+  }
 
   // constructor of the controller
   // variable $scope is the ViewModel
-  app.controller("main_controller", function ($scope, $http) {
+  app.controller("main_controller", function ($scope, $rootScope, $http) {
     $http.get('/states').success(function(response){
       var response = JSON.parse(response)
       var states = []
@@ -17,7 +24,6 @@ var app = angular.module('app', ["chart.js"]);
     });
     
     $scope.showConstituencies = function (state) {
-      console.log(state)
       $http.get('/constituencies/'+ state).success(function(response){
         var response = JSON.parse(response)
         var constituencies = []
@@ -38,7 +44,7 @@ var app = angular.module('app', ["chart.js"]);
         var votes = []
         var oldString = '';
         for(var k in response){
-          if(k !== 'Gebiet' && k !== 'Nr' && k !== 'serializable' && k !== 'gehört_zu'){
+          if(k !== 'Gebiet' && k !== 'Nr' && k !== 'serializable' && k !== 'gehört_zu' ){
           var tempString = k.replace(/_/g, ' ')
           tempString = tempString.replace('Erststimmen', "")
           tempString = tempString.replace('Zweitstimmen', "")
@@ -53,52 +59,79 @@ var app = angular.module('app', ["chart.js"]);
         var j =0
         while (i < keys.length){
         // every vote votes on pos j %2 =0 is first vote else second
-        var party = {party:keys[i], firstVotes:votes[j], secondVotes: votes[j+1] };
+        var v1 =0;
+        var v2 =0;
+        if(votes[j]){
+          v1 = parseInt(votes[j]);
+        }
+        if(votes[j+1]){
+          v2 = parseInt(votes[j+1]);
+        }
+        var party = {party:keys[i], firstVotes:v1, secondVotes: v2 };
          i = i+1 
          j = j+2
          parties.push(party)
         }
+        parties = parties.sort(compare)
         $scope.parties = parties
+        $rootScope.$broadcast('partyData', parties)
       })
     }
   });
 
-  app.controller('bar_controller', function($scope){
+  app.controller('bar_controller', function($scope, $rootScope){
     var parties = [];
     var primary = []
     var secondary = []
     // now get party information... 
-    for( var i in $scope.parties){
-        parties.push(parties[i].party)
-        primary.push(parties[i].firstVotes)
-        secondary.push(parties[i].secondVotes)
-    }
-    $scope.labels = parties
-    $scope.data = [
-      [65, 59, 80, 81, 56, 55, 40],
-      [28, 48, 40, 19, 86, 27, 90]
-    ];
+    $rootScope.$on('partyData', function(event, data) {
+      data.forEach(function(entry){
+      if(entry.party !== "Wahlberechtigte " && entry.party !== "Wähler " && entry.party !=='Ungültige ' && entry.party !== "Gültige " ){
+       parties.push(entry.party)
+       primary.push(entry.firstVotes)
+       if(entry.secondVotes){
+        j = parseInt(entry.secondVotes)
+      }else{
+        j =0
+      }
+      secondary.push(j)
+      }})
+     $scope.labels = parties;
+     $scope.data = [
+       primary, secondary
+     ];
+    });
   });
 
-  app.controller('firstVotes_pie_ctrl', function($scope){
+  app.controller('firstVotes_pie_ctrl', function($scope, $rootScope){
     var parties = [];
     var primary = []
-    var p =$scope.parties
-    // now get party information... 
-    for( var i in $scope.parties){
-        parties.push(parties[i].party)
-        primary.push(parties[i].firstVotes)
-    }
+    $rootScope.$on('partyData', function(event, data) {
+     data.forEach(function(entry){
+      if( entry.party !== "Wahlberechtigte " && entry.party !== "Wähler " && entry.party !=='Ungültige ' && entry.party !== "Gültige " ){
+      parties.push(entry.party)
+      primary.push(entry.firstVotes)
+     }})
     $scope.labels = parties;
     $scope.data = [
-      [primary]
+      primary
     ];
+   });
   });
 
-  app.controller('secondVotes_pie_ctrl', function($scope){
-    $scope.labels = ['2006', '2007', '2008', '2009', '2010', '2011', '2012'];
+  app.controller('secondVotes_pie_ctrl', function($scope, $rootScope){
+    var parties = [];
+    var secondary = []
+    $rootScope.$on('partyData', function(event, data) {
+     data.forEach(function(entry){
+      if(entry.party !== "Wahlberechtigte " && entry.party !== "Wähler " && entry.party !=='Ungültige ' && entry.party !== "Gültige " ){
+        parties.push(entry.party)
+        secondary.push(entry.firstVotes)
+     }})
+    $scope.labels = parties;
     $scope.data = [
-      [28, 48, 40, 19, 86, 27, 90]
+      secondary
     ];
+   });
   });
 
