@@ -55,7 +55,8 @@
       </div>
     </div>
     <div class="row">
-      <div class="col" ng-controller="bar_controller"'>
+      <div class="col" ng-controller="bar_controller">
+          <h8>Übersicht Erst- und Zweitstimmen</h8>
           <canvas style="width: 100%" id="bar" class="chart chart-bar"
             chart-data="data" chart-labels="labels"> chart-series="series"
           </canvas>
@@ -63,11 +64,13 @@
     </div>
     <div class="row">
       <div class="col" ng-controller='firstVotes_pie_ctrl'>
+          <h8>Verteilung Erststimmen</h8>
         <canvas style="width: 50%" id="pie" class="chart chart-pie"
         chart-data="data" chart-labels="labels" chart-options="options">
       </canvas> 
     </div>
     <div class="col">
+        <h8>Verteilung Zweitstimmen</h8>
         <div class="col" ng-controller='secondVotes_pie_ctrl'>
             <canvas style="width: 50%" id="pie" class="chart chart-pie"
             chart-data="data" chart-labels="labels" chart-options="options">

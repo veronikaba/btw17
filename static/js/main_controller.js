@@ -89,12 +89,7 @@ var app = angular.module('app', ["chart.js"]);
       if(entry.party !== "Wahlberechtigte " && entry.party !== "Wähler " && entry.party !=='Ungültige ' && entry.party !== "Gültige " ){
        parties.push(entry.party)
        primary.push(entry.firstVotes)
-       if(entry.secondVotes){
-        j = parseInt(entry.secondVotes)
-      }else{
-        j =0
-      }
-      secondary.push(j)
+       secondary.push(entry.secondVotes) 
       }})
      $scope.labels = parties;
      $scope.data = [
@@ -126,7 +121,7 @@ var app = angular.module('app', ["chart.js"]);
      data.forEach(function(entry){
       if(entry.party !== "Wahlberechtigte " && entry.party !== "Wähler " && entry.party !=='Ungültige ' && entry.party !== "Gültige " ){
         parties.push(entry.party)
-        secondary.push(entry.firstVotes)
+        secondary.push(entry.secondVotes)
      }})
     $scope.labels = parties;
     $scope.data = [
