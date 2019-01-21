@@ -111,6 +111,9 @@ var app = angular.module('app', ["chart.js"]);
     $scope.data = [
       primary
     ];
+    $scope.colors = ["rgba(224, 108, 112, 1)",
+            "rgba(224, 108, 112, 1)",
+            "rgba(224, 108, 112, 1)"]
    });
   });
 
@@ -127,6 +130,7 @@ var app = angular.module('app', ["chart.js"]);
     $scope.data = [
       secondary
     ];
+    $scope.colors = ['#72C02C', '#3498DB', '#717984', '#F1C40F'];
    });
   });
 
