@@ -2,26 +2,10 @@ var app = angular.module('app', ["chart.js"]);
   // the array contains modules that this module
   // depends on. In this case: none => empty array
 
-//service to pass data between controller
-  app.service('PartyService', function() {
-    var partyList = [];
-  
-    var addParty = function(newObj) {
-      partyList.push(newObj);
-    };
-
-    this.setParties = function(newObj){
-      partyList = newObj
-    }
-  
-    this.getParties = function(){
-        return partyList;
-    };
-  });
 
   // constructor of the controller
   // variable $scope is the ViewModel
-  app.controller("main_controller", function ($scope, PartyService, $http) {
+  app.controller("main_controller", function ($scope, $rootScope, $http) {
     $http.get('/states').success(function(response){
       var response = JSON.parse(response)
       var states = []
@@ -34,7 +18,6 @@ var app = angular.module('app', ["chart.js"]);
     });
     
     $scope.showConstituencies = function (state) {
-      console.log(state)
       $http.get('/constituencies/'+ state).success(function(response){
         var response = JSON.parse(response)
         var constituencies = []
@@ -76,8 +59,7 @@ var app = angular.module('app', ["chart.js"]);
          parties.push(party)
         }
         $scope.parties = parties
-        PartyService.setParties(parties)
-        console.log('Party content: ' + JSON.stringify(PartyService.getParties()))
+        $rootScope.$broadcast('partyData', parties)
       })
     }
   });
@@ -99,19 +81,28 @@ var app = angular.module('app', ["chart.js"]);
     ];
   });
 
-  app.controller('firstVotes_pie_ctrl', function($scope, PartyService){
+  app.controller('firstVotes_pie_ctrl', function($scope, $rootScope){
     var parties = [];
     var primary = []
-    var p = PartyService.getParties()
-    console.log('parties ' + p)
-    for( var i in p){
-        parties.push(i.party)
-        primary.push(i.firstVotes)
-    }
+    $rootScope.$on('partyData', function(event, data) {
+     var d = data
+     data.forEach(function(entry){
+      parties.push(entry.party)
+      var j= "" + JSON.stringify(entry.firstVotes) 
+      if(entry.firstVotes){
+        j = parseInt(entry.firstVotes)
+      }else{
+        j =0
+      }
+      primary.push(j)
+     })
+     console.log('parties' + parties)
+     console.log('primary' +primary)
     $scope.labels = parties;
     $scope.data = [
       [primary]
     ];
+   });
   });
 
   app.controller('secondVotes_pie_ctrl', function($scope){
