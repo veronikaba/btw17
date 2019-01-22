@@ -21,12 +21,12 @@ class Btw(Base):
     Gebiet = Column(String, primary_key = True)
     Nr = Column(Integer)
     gehört_zu = Column(Integer)
-    Wahlberechtigte_Erststimmen = Column(Integer)
-    Wahlberechtigte_Zweitstimmen = Column(Integer)
-    Wähler_Erststimmen = Column(Integer)
-    Wähler_Zweitstimmen = Column(Integer)
-    Ungültige_Erststimmen = Column(Integer)
-    Ungültige_Zweitstimmen = Column(Integer)
+    #Wahlberechtigte_Erststimmen = Column(Integer)
+    #Wahlberechtigte_Zweitstimmen = Column(Integer)
+    #Wähler_Erststimmen = Column(Integer)
+    #Wähler_Zweitstimmen = Column(Integer)
+    #Ungültige_Erststimmen = Column(Integer)
+    #Ungültige_Zweitstimmen = Column(Integer)
     Gültige_Erststimmen = Column(Integer)
     Gültige_Zweitstimmen = Column(Integer)
     Christlich_Demokratische_Union_Deutschlands_Erststimmen = Column(Integer)
@@ -116,18 +116,6 @@ class Btw(Base):
             'Nr'    : self.Nr,
             'Gebiet': self.Gebiet,    
             'gehört_zu' : self.gehört_zu,
-            'Wahlberechtigte' : {
-                'Erststimmen': self.Wahlberechtigte_Erststimmen,
-                'Zweitstimmen': self.Wahlberechtigte_Zweitstimmen
-            },
-            'Wähler': {
-                'Erststimmen': self.Wähler_Erststimmen,
-                'Zweitstimmen': self.Wähler_Zweitstimmen
-            },
-            'Ungültige': {
-                'Erststimmen': self.Ungültige_Erststimmen,
-                'Zweitstimmen': self.Ungültige_Zweitstimmen
-            },
             'Gültige': {
                 'Erststimmen': self.Gültige_Erststimmen,
                 'Zweitstimmen': self.Gültige_Zweitstimmen

@@ -9,6 +9,20 @@ var app = angular.module('app', ["chart.js"]);
     return 0;
   }
 
+  function addPercentage(list){
+    var newList = []
+    var validVotes = list[0]
+    list.forEach(function(entry){
+      if( entry.party !== "Gültige " ){
+        var vp1 = (entry.firstVotes/validVotes.firstVotes * 100).toFixed(1)
+        var vp2 = (entry.secondVotes/validVotes.secondVotes * 100).toFixed(1)
+        console.log('vp1 ' + vp1)
+          var newPartyWithPercentage  = {party: entry.party, firstVotes:entry.firstVotes, secondVotes: entry.secondVotes, firstVotesPercentage: vp1, secondVotesPercentage: vp2};
+          newList.push(newPartyWithPercentage)
+        }})
+        return newList
+  }
+
   // constructor of the controller
   // variable $scope is the ViewModel
   app.controller("main_controller", function ($scope, $rootScope, $http) {
@@ -45,9 +59,10 @@ var app = angular.module('app', ["chart.js"]);
         var oldString = '';
         for(var k in response){
           if(k !== 'Gebiet' && k !== 'Nr' && k !== 'serializable' && k !== 'gehört_zu' ){
-          var tempString = k.replace(/_/g, ' ')
+          var tempString = k
           tempString = tempString.replace('Erststimmen', "")
           tempString = tempString.replace('Zweitstimmen', "")
+          tempString = tempString.replace(/_/g, ' ')
           if(oldString != tempString){
            keys.push(tempString);
             oldString = tempString  
@@ -55,8 +70,8 @@ var app = angular.module('app', ["chart.js"]);
           votes.push(response[k])
          }
         }
-        var i=0;
-        var j =0
+        var i = 0;
+        var j = 0
         while (i < keys.length){
         // every vote votes on pos j %2 =0 is first vote else second
         var v1 =0;
@@ -73,6 +88,7 @@ var app = angular.module('app', ["chart.js"]);
          parties.push(party)
         }
         parties = parties.sort(compare)
+        parties = addPercentage(parties)
         $scope.parties = parties
         $rootScope.$broadcast('partyData', parties)
       })
@@ -86,7 +102,7 @@ var app = angular.module('app', ["chart.js"]);
     // now get party information... 
     $rootScope.$on('partyData', function(event, data) {
       data.forEach(function(entry){
-      if(entry.party !== "Wahlberechtigte " && entry.party !== "Wähler " && entry.party !=='Ungültige ' && entry.party !== "Gültige " ){
+      if(entry.party !== "Wahlberechtigte" && entry.party !== "Wähler" && entry.party !=='Ungültige' && entry.party !== "Gültige" ){
        parties.push(entry.party)
        primary.push(entry.firstVotes)
        secondary.push(entry.secondVotes) 
@@ -103,7 +119,7 @@ var app = angular.module('app', ["chart.js"]);
     var primary = []
     $rootScope.$on('partyData', function(event, data) {
      data.forEach(function(entry){
-      if( entry.party !== "Wahlberechtigte " && entry.party !== "Wähler " && entry.party !=='Ungültige ' && entry.party !== "Gültige " ){
+      if( entry.party !== "Wahlberechtigte" && entry.party !== "Wähler" && entry.party !=='Ungültige' && entry.party !== "Gültige" ){
       parties.push(entry.party)
       primary.push(entry.firstVotes)
      }})
@@ -111,8 +127,8 @@ var app = angular.module('app', ["chart.js"]);
     $scope.data = [
       primary
     ];
-    $scope.colors = ["rgba(224, 108, 112, 1)",
-            "rgba(224, 108, 112, 1)",
+    $scope.colors = ["rgba(0, 0, 0, 1)",
+            "rgba(255, 0, 0, 1)",
             "rgba(224, 108, 112, 1)"]
    });
   });
@@ -130,7 +146,5 @@ var app = angular.module('app', ["chart.js"]);
     $scope.data = [
       secondary
     ];
-    $scope.colors = ['#72C02C', '#3498DB', '#717984', '#F1C40F'];
    });
   });
-
