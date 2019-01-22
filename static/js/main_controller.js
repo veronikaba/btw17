@@ -16,7 +16,7 @@ var app = angular.module('app', ["chart.js"]);
       if( entry.party !== "Gültige " ){
         var vp1 = (entry.firstVotes/validVotes.firstVotes * 100).toFixed(1)
         var vp2 = (entry.secondVotes/validVotes.secondVotes * 100).toFixed(1)
-        console.log('vp1 ' + vp1)
+
           var newPartyWithPercentage  = {party: entry.party, firstVotes:entry.firstVotes, secondVotes: entry.secondVotes, firstVotesPercentage: vp1, secondVotesPercentage: vp2};
           newList.push(newPartyWithPercentage)
         }})
@@ -111,6 +111,11 @@ var app = angular.module('app', ["chart.js"]);
      $scope.data = [
        primary, secondary
      ];
+     $scope.colors = [["rgba(0, 0, 0, 1)",
+     "rgba(255, 0, 0, 1)",
+     "rgba(0, 255, 0, 1)",
+     "rgba(0, 255, 255, 1)",
+     "rgba(100, 255, 100, 1)"]]
     });
   });
 
@@ -127,9 +132,6 @@ var app = angular.module('app', ["chart.js"]);
     $scope.data = [
       primary
     ];
-    $scope.colors = ["rgba(0, 0, 0, 1)",
-            "rgba(255, 0, 0, 1)",
-            "rgba(224, 108, 112, 1)"]
    });
   });
 
