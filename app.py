@@ -162,7 +162,6 @@ def get_constituency(const):
 @app.route('/constituencies/<name>', methods=['GET'])
 def get_state_by_name(name):
     state = session.query(Btw.Nr).filter(Btw.Gebiet.contains(name)).filter(Btw.gehört_zu.contains('99')).first()
-    logging.error(state)
     constintuencies = session.query(Btw).filter_by(gehört_zu = state[0]).all()
     return jsonify(json.dumps(constintuencies, cls=AlchemyEncoder))
 

@@ -1,44 +1,148 @@
-from sqlalchemy import create_engine
-from sqlalchemy import ForeignKey
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm import relationship
-from sqlalchemy import Table
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Integer, Column, String
-from flask import Flask
-from flask import render_template
-from flask import g
-from numpy import genfromtxt
-import csv
-import logging
+from flask import Flask, render_template, send_from_directory, g, jsonify
+from sqlalchemy import Integer, Column, String, Sequence, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
+from sqlalchemy.pool import SingletonThreadPool
+from sqlalchemy import create_engine, Table
+from sqlalchemy.orm import sessionmaker, relationship
 import sqlite3
-
+import logging
+import csv, json
+from csv_reader import read_csv
 
 Base = declarative_base()
-engine = create_engine('sqlite:///btw17.db')
+engine = create_engine('sqlite:///btw17.db', connect_args={'check_same_thread': False})
 Base.metadata.create_all(engine)
-Session = sessionmaker(bind = engine, autocommit = True)
+Session = sessionmaker(bind = engine)
 session = Session()
 app = Flask(__name__)
 
-con = sqlite3.connect('btw17m.db')
-cur = con.cursor()
-cur.execute("CREATE TABLE btw17 (Nr, Gebiet, gehört_zu, Wahlberechtigte_Erststimmen, Wahlberechtigte_Zweitstimmen, Wähler_Erststimmen, Wähler_Zweitstimmen, Ungültige_Erststimmen, Ungültige_Zweitstimmen, Gültige_Erststimmen, Gültige_Zweitstimmen, Christlich_Demokratische_Union_Deutschlands_Erststimmen, Christlich_Demokratische_Union_Deutschlands_Zweitstimmen, Sozialdemokratische_Partei_Deutschlands_Erststimmen, Sozialdemokratische_Partei_Deutschlands_Zweitstimmen, DIE_LINKE_Erststimmen, DIE_LINKE_Zweitstimmen, BÜNDNIS_90_DIE_GRÜNEN_Erststimmen, BÜNDNIS_90_DIE_GRÜNEN_Zweitstimmen, Christlich_Soziale_Union_in_Bayern_e_V_Erststimmen, Christlich_Soziale_Union_in_Bayern_e_V_Zweitstimmen, Freie_Demokratische_Partei_Erststimmen, Freie_Demokratische_Partei_Zweitstimmen, Alternative_für_Deutschland_Erststimmen, Alternative_für_Deutschland_Zweitstimmen, Piratenpartei_Deutschland_Erststimmen, Piratenpartei_Deutschland_Zweitstimmen, Nationaldemokratische_Partei_Deutschlands_Erststimmen, Nationaldemokratische_Partei_Deutschlands_Zweitstimmen, FREIE_WÄHLER_Erststimmen, FREIE_WÄHLER_Zweitstimmen, PARTEI_MENSCH_UMWELT_TIERSCHUTZ_Erststimmen, PARTEI_MENSCH_UMWELT_TIERSCHUTZ_Zweitstimmen, Ökologisch_Demokratische_Partei_Erststimmen, Ökologisch_Demokratische_Partei_Zweitstimmen, Partei_für_Arbeit_Rechtsstaat_Tierschutz_Elitenförderung_und_basisdemokratische_Initiative_Erststimmen, Partei_für_Arbeit_Rechtsstaat_Tierschutz_Elitenförderung_und_basisdemokratische_Initiative_Zweitstimmen, Bayernpartei_Erststimmen, Bayernpartei_Zweitstimmen, Ab_jetzt_Demokratie_durch_Volksabstimmung_Erststimmen, Ab_jetzt_Demokratie_durch_Volksabstimmung_Zweitstimmen, Partei_der_Vernunft_Erststimmen, Partei_der_Vernunft_Zweitstimmen, Marxistisch_Leninistische_Partei_Deutschlands_Erststimmen, Marxistisch_Leninistische_Partei_Deutschlands_Zweitstimmen, Bürgerrechtsbewegung_Solidarität_Erststimmen, Bürgerrechtsbewegung_Solidarität_Zweitstimmen, Sozialistische_Gleichheitspartei_Erststimmen, Sozialistische_Gleichheitspartei_Zweitstimmen, Vierte_Internationale_Erststimmen, Vierte_Internationale_Zweitstimmen, DIE_RECHTE_Erststimmen, DIE_RECHTE_Zweitstimmen, Allianz_Deutscher_Demokraten_Erststimmen, Allianz_Deutscher_Demokraten_Zweitstimmen, Allianz_für_Menschenrechte_Erststimmen, Allianz_für_Menschenrechte_Zweitstimmen, Tier_und_Naturschutz_bergpartei_Erststimmen, Tier_und_Naturschutz_bergpartei_Zweitstimmen, die_überpartei_Erststimmen, die_überpartei_Zweitstimmen, Bündnis_Grundeinkommen_Erststimmen, Bündnis_Grundeinkommen_Zweitstimmen, DEMOKRATIE_IN_BEWEGUNG_Erststimmen, DEMOKRATIE_IN_BEWEGUNG_Zweitstimmen, Deutsche_Kommunistische_Partei_Erststimmen, Deutsche_Kommunistische_Partei_Zweitstimmen, Deutsche_Mitte_Erststimmen, Deutsche_Mitte_Zweitstimmen, Die_Grauen_Für_alle_Generationen_Erststimmen, Die_Grauen_Für_alle_Generationen_Zweitstimmen, Die_Urbane_Eine_HipHop_Partei_Erststimmen, Die_Urbane_Eine_HipHop_Partei_Zweitstimmen, Madgeburger_Gartenpartei_Erststimmen, Madgeburger_Gartenpartei_Zweitstimmen, Menschliche_Welt_Erststimmen, Menschliche_Welt_Zweitstimmen, Partei_der_Humanisten_Erststimmen, Partei_der_Humanisten_Zweitstimmen,Partei_für_Gesundheitsforschung_Erststimmen, Partei_für_Gesundheitsforschung_Zweitstimmen, V_Partei3_Partei_für_Veränderung_Vegetarier_und_Veganer_Erststimmen, V_Partei3_Partei_für_Veränderung_Vegetarier_und_Veganer_Zweitstimmen, Bündnis_C_Christen_für_Deutschland_Erststimmen, Bündnis_C_Christen_für_Deutschland_Zweitstimmen, DIE_EINHEIT_Erststimmen, DIE_EINHEIT_Zweitstimmen, Die_Violetten_Erststimmen, Die_Violetten_Zweitstimmen, Familien_Partei_Deutschlands_Erststimmen, Familien_Partei_Deutschlands_Zweitstimmen, Feministische_Partei_DIE_FRAUEN_Erststimmen, Feministische_Partei_DIE_FRAUEN_Zweitstimmen, Mieterpartei_Erststimmen, Mieterpartei_Zweitstimmen, Neue_Liberale_Die_Sozialliberalen_Erststimmen, Neue_Liberale_Die_Sozialliberalen_Zweitstimmen, UNABHÄNGIGE_für_bürgernahe_Demokratie);")
-with open('btw17/btw17_kerg_modified_v2.csv','rt', encoding = 'utf-8') as fin:
-        dr = csv.DictReader(fin)
-        to_db = [(i['Nr'], i['Gebiet'], i['gehört zu'], i['Wahlberechtigte Erststimmen'],  i['Wahlberechtigte Zweitstimmen'], i['Wähler Erststimmen'], i['Wähler Zweitstimmen'], i['Ungültige Erststimmen'], i['Ungültige Zweitstimmen'], i['Gültige Erststimmen'], i['Gültige Zweitstimmen'], i['Christlich Demokratische Union Deutschlands Erststimmen'], i['Christlich Demokratische Union Deutschlands Zweitstimmen'], i['Sozialdemokratische Partei Deutschlands Erststimmen'], i['Sozialdemokratische Partei Deutschlands Zweitstimmen'], i['DIE LINKE Erststimmen'], i['DIE LINKE Zweitstimmen'], i['BÜNDNIS 90/DIE GRÜNEN Erststimmen'], i['BÜNDNIS 90/DIE GRÜNEN Zweitstimmen'], i['Christlich-Soziale Union in Bayern e.V. Erststimmen'], i['Christlich-Soziale Union in Bayern e.V. Zweitstimmen'], i['Freie Demokratische Partei Erststimmen'], i['Freie Demokratische Partei Zweitstimmen'], i['Alternative für Deutschland Erststimmen'], i['Alternative für Deutschland Zweitstimmen'], i['Piratenpartei Deutschland Erststimmen'], i['Piratenpartei Deutschland Zweitstimmen'], i['Nationaldemokratische Partei Deutschlands Erststimmen'], i['Nationaldemokratische Partei Deutschlands Zweitstimmen'], i['FREIE WÄHLER Erststimmen'], i['FREIE WÄHLER Zweitstimmen'], i['PARTEI MENSCH UMWELT TIERSCHUTZ Erststimmen'], i['PARTEI MENSCH UMWELT TIERSCHUTZ Zweitstimmen'], i['Ökologisch-Demokratische Partei Erststimmen'], i['Ökologisch-Demokratische Partei Zweitstimmen'], i['Partei für Arbeit Rechtsstaat Tierschutz Elitenförderung und basisdemokratische Initiative Erststimmen'], i['Partei für Arbeit Rechtsstaat Tierschutz Elitenförderung und basisdemokratische Initiative Zweitstimmen'], i['Bayernpartei Erststimmen'], i['Bayernpartei Zweitstimmen'], i['Ab jetzt...Demokratie durch Volksabstimmung Erststimmen'], i['Ab jetzt...Demokratie durch Volksabstimmung Zweitstimmen'], i['Partei der Vernunft Erststimmen'], i['Partei der Vernunft Zweitstimmen'], i['Marxistisch-Leninistische Partei Deutschlands Erststimmen'], i['Marxistisch-Leninistische Partei Deutschlands Zweitstimmen'], i['Bürgerrechtsbewegung Solidarität Erststimmen'], i['Bürgerrechtsbewegung Solidarität Zweitstimmen'], i['Sozialistische Gleichheitspartei Erststimmen'], i['Sozialistische Gleichheitspartei Zweitstimmen'], i['Vierte Internationale Erststimmen'], i['Vierte Internationale Zweitstimmen'], i['DIE RECHTE Erststimmen'], i['DIE RECHTE Zweitstimmen'], i['Allianz Deutscher Demokraten Erststimmen'], i['Allianz Deutscher Demokraten Zweitstimmen'], i['Allianz für Menschenrechte Erststimmen'], i['Allianz für Menschenrechte Zweitstimmen'], i['Tier- und Naturschutz bergpartei Erststimmen'], i['Tier- und Naturschutz bergpartei Zweitstimmen'], i['die überpartei Erststimmen'], i['die überpartei Zweitstimmen'], i['Bündnis Grundeinkommen Erststimmen'], i['Bündnis Grundeinkommen Zweitstimmen'], i['DEMOKRATIE IN BEWEGUNG Erststimmen'], i['DEMOKRATIE IN BEWEGUNG Zweitstimmen'], i['Deutsche Kommunistische Partei Erststimmen'], i['Deutsche Kommunistische Partei Zweitstimmen'], i['Deutsche Mitte Erststimmen'], i['Deutsche Mitte Zweitstimmen'], i['Die Grauen – Für alle Generationen Erststimmen'], i['Die Grauen – Für alle Generationen Zweitstimmen'], i['Die Urbane. Eine HipHop Partei Erststimmen'], i['Die Urbane. Eine HipHop Partei Zweitstimmen'], i['Madgeburger Gartenpartei Erststimmen'], i['Madgeburger Gartenpartei Zweitstimmen'], i['Menschliche Welt Erststimmen'], i['Menschliche Welt Zweitstimmen'], i['Partei der Humanisten Erststimmen'], i['Partei der Humanisten Zweitstimmen'], i['Partei für Gesundheitsforschung Erststimmen'], i['Partei für Gesundheitsforschung Zweitstimmen'], i['V-Partei³ - Partei für Veränderung, Vegetarier und Veganer Erststimmen'], i['V-Partei³ - Partei für Veränderung, Vegetarier und Veganer Zweitstimmen'] , i['Bündnis C – Christen für Deutschland Erststimmen'], i['Bündnis C – Christen für Deutschland Zweitstimmen'], i['DIE EINHEIT Erststimmen'], i['DIE EINHEIT Zweitstimmen'], i['Die Violetten Erststimmen'], i['Die Violetten Zweitstimmen'], i['Familien-Partei Deutschlands Erststimmen'], i['Familien-Partei Deutschlands Zweitstimmen'], i['Feministische Partei DIE FRAUEN Erststimmen'], i['Feministische Partei DIE FRAUEN Zweitstimmen'], i['Mieterpartei Erststimmen'], i['Mieterpartei Zweitstimmen'], i['Neue Liberale – Die Sozialliberalen Erststimmen'], i['Neue Liberale – Die Sozialliberalen Zweitstimmen'], i['UNABHÄNGIGE für bürgernahe Demokratie']) for i in dr]
-cur.executemany("INSERT INTO btw17 (Nr, Gebiet, gehört_zu, Wahlberechtigte_Erststimmen, Wahlberechtigte_Zweitstimmen, Wähler_Erststimmen, Wähler_Zweitstimmen, Ungültige_Erststimmen, Ungültige_Zweitstimmen, Gültige_Erststimmen, Gültige_Zweitstimmen, Christlich_Demokratische_Union_Deutschlands_Erststimmen, Christlich_Demokratische_Union_Deutschlands_Zweitstimmen, Sozialdemokratische_Partei_Deutschlands_Erststimmen, Sozialdemokratische_Partei_Deutschlands_Zweitstimmen, DIE_LINKE_Erststimmen, DIE_LINKE_Zweitstimmen, BÜNDNIS_90_DIE_GRÜNEN_Erststimmen, BÜNDNIS_90_DIE_GRÜNEN_Zweitstimmen, Christlich_Soziale_Union_in_Bayern_e_V_Erststimmen, Christlich_Soziale_Union_in_Bayern_e_V_Zweitstimmen, Freie_Demokratische_Partei_Erststimmen, Freie_Demokratische_Partei_Zweitstimmen, Alternative_für_Deutschland_Erststimmen, Alternative_für_Deutschland_Zweitstimmen, Piratenpartei_Deutschland_Erststimmen, Piratenpartei_Deutschland_Zweitstimmen, Nationaldemokratische_Partei_Deutschlands_Erststimmen, Nationaldemokratische_Partei_Deutschlands_Zweitstimmen, FREIE_WÄHLER_Erststimmen, FREIE_WÄHLER_Zweitstimmen, PARTEI_MENSCH_UMWELT_TIERSCHUTZ_Erststimmen, PARTEI_MENSCH_UMWELT_TIERSCHUTZ_Zweitstimmen, Ökologisch_Demokratische_Partei_Erststimmen, Ökologisch_Demokratische_Partei_Zweitstimmen, Partei_für_Arbeit_Rechtsstaat_Tierschutz_Elitenförderung_und_basisdemokratische_Initiative_Erststimmen, Partei_für_Arbeit_Rechtsstaat_Tierschutz_Elitenförderung_und_basisdemokratische_Initiative_Zweitstimmen, Bayernpartei_Erststimmen, Bayernpartei_Zweitstimmen, Ab_jetzt_Demokratie_durch_Volksabstimmung_Erststimmen, Ab_jetzt_Demokratie_durch_Volksabstimmung_Zweitstimmen, Partei_der_Vernunft_Erststimmen, Partei_der_Vernunft_Zweitstimmen, Marxistisch_Leninistische_Partei_Deutschlands_Erststimmen, Marxistisch_Leninistische_Partei_Deutschlands_Zweitstimmen, Bürgerrechtsbewegung_Solidarität_Erststimmen, Bürgerrechtsbewegung_Solidarität_Zweitstimmen, Sozialistische_Gleichheitspartei_Erststimmen, Sozialistische_Gleichheitspartei_Zweitstimmen, Vierte_Internationale_Erststimmen, Vierte_Internationale_Zweitstimmen, DIE_RECHTE_Erststimmen, DIE_RECHTE_Zweitstimmen, Allianz_Deutscher_Demokraten_Erststimmen, Allianz_Deutscher_Demokraten_Zweitstimmen, Allianz_für_Menschenrechte_Erststimmen, Allianz_für_Menschenrechte_Zweitstimmen, Tier_und_Naturschutz_bergpartei_Erststimmen, Tier_und_Naturschutz_bergpartei_Zweitstimmen, die_überpartei_Erststimmen, die_überpartei_Zweitstimmen, Bündnis_Grundeinkommen_Erststimmen, Bündnis_Grundeinkommen_Zweitstimmen, DEMOKRATIE_IN_BEWEGUNG_Erststimmen, DEMOKRATIE_IN_BEWEGUNG_Zweitstimmen, Deutsche_Kommunistische_Partei_Erststimmen, Deutsche_Kommunistische_Partei_Zweitstimmen, Deutsche_Mitte_Erststimmen, Deutsche_Mitte_Zweitstimmen, Die_Grauen_Für_alle_Generationen_Erststimmen, Die_Grauen_Für_alle_Generationen_Zweitstimmen, Die_Urbane_Eine_HipHop_Partei_Erststimmen, Die_Urbane_Eine_HipHop_Partei_Zweitstimmen, Madgeburger_Gartenpartei_Erststimmen, Madgeburger_Gartenpartei_Zweitstimmen, Menschliche_Welt_Erststimmen, Menschliche_Welt_Zweitstimmen, Partei_der_Humanisten_Erststimmen, Partei_der_Humanisten_Zweitstimmen, Partei_für_Gesundheitsforschung_Erststimmen, Partei_für_Gesundheitsforschung_Zweitstimmen, V_Partei3_Partei_für_Veränderung_Vegetarier_und_Veganer_Erststimmen,V_Partei3_Partei_für_Veränderung_Vegetarier_und_Veganer_Zweitstimmen , Bündnis_C_Christen_für_Deutschland_Erststimmen, Bündnis_C_Christen_für_Deutschland_Zweitstimmen, DIE_EINHEIT_Erststimmen, DIE_EINHEIT_Zweitstimmen, Die_Violetten_Erststimmen, Die_Violetten_Zweitstimmen, Familien_Partei_Deutschlands_Erststimmen, Familien_Partei_Deutschlands_Zweitstimmen, Feministische_Partei_DIE_FRAUEN_Erststimmen, Feministische_Partei_DIE_FRAUEN_Zweitstimmen, Mieterpartei_Erststimmen, Mieterpartei_Zweitstimmen, Neue_Liberale_Die_Sozialliberalen_Erststimmen, Neue_Liberale_Die_Sozialliberalen_Zweitstimmen, UNABHÄNGIGE_für_bürgernahe_Demokratie) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,? , ?, ?, ?, ?, ?);", to_db)
-con.commit()
-con.close()
 
-def get_db() :
- if not hasattr(g,'sqlite_db'):
-  con = sqlite3.connect('btw17.db')
-  g.sqlite_db = con
- return g.sqlite_db
+class State(Base):
+    __tablename__ = 'states'
+    id = Column(Integer, primary_key = True, nullable = False)
+    #number = Column(Integer)
+    name = Column(String)
+    belongs_to = Column(Integer)  
+    constituencies = relationship('Constituency')
+
+    @property
+    def serializable(self):
+        return{
+            'id': self.id,
+            'name': self.name,
+            'belongs_to': self.belongs_to,
+            'constituencies': self.constituencies
+        }
+
+
+ 
+class Constituency(Base):
+    __tablename__ = 'constituencies'    
+    id = Column(Integer, primary_key = True, nullable = False)
+    #number = Column(Integer)
+    belongs_to = Column(Integer)
+    state_id = Column(Integer, ForeignKey('states.id'))
+    state = relationship('State')
+    party_id = relationship(Integer, ForeignKey('party.id'))
+    parties = relationship('Party')
+
+    @property
+    def serializable(self):
+        return{
+            'id': self.id,
+            'belongs_to': self.belongs_to,
+            'state_id': self.state_id,
+            'state': self.state,
+            'party_id': self.party_id,
+            'parties': self.parties
+        }
+
+class Parties(Base):
+    __tablename__ = 'parties'
+    id = Column(Integer, primary_key = True, nullable = False)
+    name = Column(String)
+    constituency_id = Column(Integer, ForeignKey('constituencies.id'))
+    constituency = relationship('Constituency')
+    votes = relationship("Votes")
+
+    @property
+    def serializable(self):
+        return{
+            'id': self.id,
+            'name': self.name,
+            'constituency_id': self.constituency_id,
+            'constituency': self.constituency,
+            'votes': self.votes
+        }
+    
+ 
+class Votes(Base):
+    __tablename__ = 'votes'
+    id = Column(Integer, primary_key=True)
+    first_provisionally_votes = Column(Integer)
+    first_previous_votes = Column(Integer)
+    second_provisionally_votes = Column(Integer)
+    second_previous_votes = Column(Integer)
+    party_id = Column(Integer, ForeignKey('parties.id'))
+    party = relationship('Party')
+
+    @property
+    def serializable(self):
+        return{
+        'id': self.id,
+        'provisionally_votes': self.provisionally_votes,
+        'previouse_votes': self.prevous_votes,
+        'party_id': self.party_id,
+        'party': self.party
+        }
+
+Base.metadata.create_all(engine)
+
+def addData():
+        data = read_csv()
+        session = Session()
+        for c in data:
+            id = c.get('id')
+            name = c.get('name')
+            belongs_to = c.get('belongs_to')
+
+            if belongs_to != 99:
+                d = Constituency( id = id, name = name, belongs_to = belongs_to)
+            else:
+                d = State(id = id, name = name)
+            
+            for i in d.results:
+                party = get_party_by_name(i.get('name'))
+                if party != []:
+                    party_id =party.id
+                else:
+                     party = Parties(name = party.name)
+                     session.add(party)
+                     session.commit()
+                     session.flush()
+                     party_id = party.id
+                    
+                votes = Votes (party_id = party.id, first_provisionally_votes = i.get('first').get('provisional'), first_prevoius_votes = i.get('first').get('previous'), second_provisionally_votes = i.get('second').get('provisional'), second_previous_votes = i.get('second'.get('previous')) )
+                session.add(votes)
+                session.commit()
+                session.flush()
+
+def get_party_by_name(name):
+        party = session.query(Parties).filter(Parties.name).first()
+        return party
+    
+
+
+def get_db():
+    if not hasattr(g, 'sqlight_db'):
+        con = sqlite3.connect('btw17.db')
+        g.sqlite_db = con
+    return g.sqlite_db        
+
 
 @app.teardown_appcontext
-def close_db (error):
-  if hasattr (g, 'sqlite_db'):g.sqlite_db.close ()
+def close_db():
+     if hasattr(g, 'sqlight_db'): g.sqlite.db.close()
 
-#app.run(debug=True)
+
+app.run(debug=True)
