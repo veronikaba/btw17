@@ -72,7 +72,7 @@ class Vote(Base):
     second_previous_votes = Column(Integer)
     party_id = Column(Integer, ForeignKey('parties.id'))
     party = relationship('Party')
-    constituency_id = (Integer, ForeignKey('constituenies.id'))
+    constituency_id = Column(Integer, ForeignKey('constituenies.id'))
     constituency = relationship('Constituency')
 
     @property
