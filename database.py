@@ -104,7 +104,7 @@ def addData():
             if belongs_to != '99' and belongs_to != '':
                 d = Constituency(id = id, name = name, belongs_to = belongs_to)
             else:
-                d = State(id = id, name = name)
+                d = State(id = id, name = name, belongs_to = '99')
             session.add(d)
             session.commit()
             session.flush
@@ -119,7 +119,7 @@ def addData():
                     session.flush()
                     party_id = party.id
                     
-                votes = Vote(party_id = party.id,constituency_id = id , first_provisionally_votes = i.get('first').get('provisional'), first_previous_votes = i.get('first').get('previous'), second_provisionally_votes = i.get('second').get('provisional'), second_previous_votes = i.get('second').get('previous')) 
+                votes = Vote(party_id = party.id,constituency_id = id , first_provisional_votes = i.get('first').get('provisional'), first_previous_votes = i.get('first').get('previous'), second_provisional_votes = i.get('second').get('provisional'), second_previous_votes = i.get('second').get('previous')) 
                 session.add(votes)
                 session.commit()
                 session.flush()
@@ -127,8 +127,8 @@ def addData():
 
 
 def get_party_by_name(name):
-        party = session.query(Party.serializable).filter(Party.name).first()
-        return json.dumps(party)
+        party = session.query(Party).filter(Party.name).first()
+        return party
 
 @app.route('/states', methods=['GET'])    
 def get_states():
