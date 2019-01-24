@@ -27,10 +27,11 @@ var app = angular.module('app', ["chart.js"]);
   // variable $scope is the ViewModel
   app.controller("main_controller", function ($scope, $rootScope, $http) {
     $http.get('/states').success(function(response){
-      var response = JSON.parse(response)
       var states = []
+      console.log(response)
       for (var i = 0; i < response.length; i++){
-        states[i] = response[i][0];
+        var state = {name: response[i][0], id: response[i][1]}
+        states.push(state)
       }
       $scope.states = states
     }).error(function(response){

@@ -1,5 +1,5 @@
 from flask import Flask, render_template, send_from_directory, g, jsonify
-from sqlalchemy import Integer, Column, String, Sequence
+from sqlalchemy import Integer, Column, String, Sequence, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 from sqlalchemy.pool import SingletonThreadPool
 from sqlalchemy import create_engine, Table
@@ -7,6 +7,7 @@ from sqlalchemy.orm import sessionmaker, relationship
 import sqlite3
 import logging
 import csv, json
+from csv_reader import read_csv
 
 Base = declarative_base()
 engine = create_engine('sqlite:///btw17.db', connect_args={'check_same_thread': False})
@@ -16,113 +17,131 @@ session = Session()
 app = Flask(__name__)
 
 
-class Btw(Base):
-    __tablename__ = 'btw17'
-    Gebiet = Column(String, primary_key = True)
-    Nr = Column(Integer)
-    gehört_zu = Column(Integer)
-    #Wahlberechtigte_Erststimmen = Column(Integer)
-    #Wahlberechtigte_Zweitstimmen = Column(Integer)
-    #Wähler_Erststimmen = Column(Integer)
-    #Wähler_Zweitstimmen = Column(Integer)
-    #Ungültige_Erststimmen = Column(Integer)
-    #Ungültige_Zweitstimmen = Column(Integer)
-    Gültige_Erststimmen = Column(Integer)
-    Gültige_Zweitstimmen = Column(Integer)
-    Christlich_Demokratische_Union_Deutschlands_Erststimmen = Column(Integer)
-    Christlich_Demokratische_Union_Deutschlands_Zweitstimmen = Column(Integer)
-    Sozialdemokratische_Partei_Deutschlands_Erststimmen = Column(Integer)
-    Sozialdemokratische_Partei_Deutschlands_Zweitstimmen = Column(Integer)
-    BÜNDNIS_90_DIE_GRÜNEN_Erststimmen = Column(Integer)
-    BÜNDNIS_90_DIE_GRÜNEN_Zweitstimmen = Column(Integer)
-    Christlich_Soziale_Union_in_Bayern_e_V_Erststimmen = Column(Integer)
-    Christlich_Soziale_Union_in_Bayern_e_V_Zweitstimmen = Column(Integer)
-    Freie_Demokratische_Partei_Erststimmen = Column(Integer)
-    Freie_Demokratische_Partei_Zweitstimmen = Column(Integer)
-    Alternative_für_Deutschland_Erststimmen = Column(Integer)
-    Alternative_für_Deutschland_Zweitstimmen = Column(Integer)
-    Piratenpartei_Deutschland_Erststimmen = Column(Integer)
-    Piratenpartei_Deutschland_Zweitstimmen = Column(Integer)
-    Nationaldemokratische_Partei_Deutschlands_Erststimmen = Column(Integer)
-    Nationaldemokratische_Partei_Deutschlands_Zweitstimmen = Column(Integer)
-    FREIE_WÄHLER_Erststimmen = Column(Integer)
-    FREIE_WÄHLER_Zweitstimmen = Column(Integer)
-    PARTEI_MENSCH_UMWELT_TIERSCHUTZ_Erststimmen = Column(Integer)
-    PARTEI_MENSCH_UMWELT_TIERSCHUTZ_Zweitstimmen = Column(Integer)
-    Ökologisch_Demokratische_Partei_Erststimmen = Column(Integer)
-    Ökologisch_Demokratische_Partei_Zweitstimmen = Column(Integer)
-    Partei_für_Arbeit_Rechtsstaat_Tierschutz_Elitenförderung_und_basisdemokratische_Initiative_Erststimmen = Column(Integer)    
-    Partei_für_Arbeit_Rechtsstaat_Tierschutz_Elitenförderung_und_basisdemokratische_Initiative_Zweitstimmen = Column(Integer)
-    Bayernpartei_Erststimmen = Column(Integer)
-    Bayernpartei_Zweitstimmen = Column(Integer)
-    Ab_jetzt_Demokratie_durch_Volksabstimmung_Erststimmen = Column(Integer)
-    Ab_jetzt_Demokratie_durch_Volksabstimmung_Zweitstimmen = Column(Integer)
-    Partei_der_Vernunft_Erststimmen = Column(Integer)
-    Partei_der_Vernunft_Zweitstimmen = Column(Integer)
-    Marxistisch_Leninistische_Partei_Deutschlands_Erststimmen = Column(Integer)
-    Marxistisch_Leninistische_Partei_Deutschlands_Zweitstimmen = Column(Integer)
-    Bürgerrechtsbewegung_Solidarität_Erststimmen = Column(Integer)
-    Bürgerrechtsbewegung_Solidarität_Zweitstimmen = Column(Integer)
-    Sozialistische_Gleichheitspartei_Erststimmen = Column(Integer)
-    Sozialistische_Gleichheitspartei_Zweitstimmen = Column(Integer)
-    Vierte_Internationale_Erststimmen = Column(Integer)
-    Vierte_Internationale_Zweitstimmen = Column(Integer)
-    DIE_RECHTE_Erststimmen = Column(Integer)
-    DIE_RECHTE_Zweitstimmen = Column(Integer)
-    Allianz_Deutscher_Demokraten_Erststimmen = Column(Integer)
-    Allianz_Deutscher_Demokraten_Zweitstimmen = Column(Integer)
-    Allianz_für_Menschenrechte_Erststimmen = Column(Integer)
-    Allianz_für_Menschenrechte_Zweitstimmen = Column(Integer)
-    Tier_und_Naturschutz_bergpartei_Erststimmen = Column(Integer)
-    Tier_und_Naturschutz_bergpartei_Zweitstimmen = Column(Integer)
-    die_überpartei_Erststimmen = Column(Integer)
-    die_überpartei_Zweitstimmen = Column(Integer)
-    Bündnis_Grundeinkommen_Erststimmen = Column(Integer)
-    Bündnis_Grundeinkommen_Zweitstimmen = Column(Integer)
-    DEMOKRATIE_IN_BEWEGUNG_Erststimmen = Column(Integer)
-    DEMOKRATIE_IN_BEWEGUNG_Zweitstimmen = Column(Integer)
-    Deutsche_Kommunistische_Partei_Erststimmen = Column(Integer)
-    Deutsche_Kommunistische_Partei_Zweitstimmen = Column(Integer)
-    Deutsche_Mitte_Erststimmen = Column(Integer)
-    Deutsche_Mitte_Zweitstimmen = Column(Integer)
-    Die_Grauen_Für_alle_Generationen_Erststimmen = Column(Integer)
-    Die_Grauen_Für_alle_Generationen_Zweitstimmen = Column(Integer)
-    Die_Urbane_Eine_HipHop_Partei_Erststimmen = Column(Integer)
-    Die_Urbane_Eine_HipHop_Partei_Zweitstimmen = Column(Integer)
-    Madgeburger_Gartenpartei_Erststimmen = Column(Integer)
-    Madgeburger_Gartenpartei_Zweitstimmen = Column(Integer)
-    Menschliche_Welt_Erststimmen = Column(Integer)
-    Menschliche_Welt_Zweitstimmen = Column(Integer)
-    Partei_der_Humanisten_Erststimmen = Column(Integer)
-    Partei_der_Humanisten_Zweitstimmen = Column(Integer)
-    Partei_für_Gesundheitsforschung_Erststimmen = Column(Integer)
-    Partei_für_Gesundheitsforschung_Zweitstimmen = Column(Integer)
-    V_Partei3_Partei_für_Veränderung_Vegetarier_und_Veganer_Erststimmen = Column(Integer)
-    V_Partei3_Partei_für_Veränderung_Vegetarier_und_Veganer_Zweitstimmen = Column(Integer)
-    Die_Violetten_Erststimmen = Column(Integer)
-    Die_Violetten_Zweitstimmen = Column(Integer)
-    Familien_Partei_Deutschlands_Erststimmen = Column(Integer)
-    Familien_Partei_Deutschlands_Zweitstimmen = Column(Integer)
-    Feministische_Partei_DIE_FRAUEN_Erststimmen = Column(Integer)
-    Feministische_Partei_DIE_FRAUEN_Zweitstimmen = Column(Integer)
-    Mieterpartei_Erststimmen = Column(Integer)
-    Mieterpartei_Zweitstimmen = Column(Integer)
-    Neue_Liberale_Die_Sozialliberalen_Erststimmen = Column(Integer)
-    Neue_Liberale_Die_Sozialliberalen_Zweitstimmen = Column(Integer)
+class State(Base):
+    __tablename__ = 'states'
+    id = Column(Integer, primary_key = True)
+    name = Column(String)
+    belongs_to = Column(Integer)
+    constituencies = relationship('Constituency')
 
     @property
     def serializable(self):
         return{
-            'Nr'    : self.Nr,
-            'Gebiet': self.Gebiet,    
-            'gehört_zu' : self.gehört_zu,
-            'Gültige': {
-                'Erststimmen': self.Gültige_Erststimmen,
-                'Zweitstimmen': self.Gültige_Zweitstimmen
-            }
-    }
+            'id': self.id,
+            'name': self.name,
+            'belongs_to': self.belongs_to
+        }
+
+class Constituency(Base):
+    __tablename__ = 'constituencies'
+    id = Column(Integer, primary_key = True, nullable = False)
+    name = Column(String)
+    belongs_to = Column(Integer, ForeignKey('states.id'))
+    state = relationship('State')
+    votes = relationship('Vote')
+
+    @property
+    def serializable(self):
+        return{
+            'id': self.id,
+            'name': self.id,
+            'belongs_to': self.belongs_to
+        }
+
+class Party(Base):
+    __tablename__ = 'parties'
+    id = Column(Integer, primary_key = True, nullable = False)
+    name = Column(String)        
+    votes = relationship("Vote")
+
+    @property
+    def serializable(self):
+        return{
+            'id': self.id,
+            'name': self.name
+        }
+    
+ 
+class Vote(Base):
+    __tablename__ = 'votes'
+    id = Column(Integer, primary_key=True)
+    first_provisional_votes = Column(Integer)
+    first_previous_votes = Column(Integer)
+    second_provisional_votes = Column(Integer)
+    second_previous_votes = Column(Integer)
+    party_id = Column(Integer, ForeignKey('parties.id'))
+    party = relationship('Party')
+    constituency_id = Column(Integer, ForeignKey('constituencies.id'))
+    constituency = relationship('Constituency')
+
+    @property
+    def serializable(self):
+        return{
+        'id': self.id,
+        'provisionall_votes': {
+            'first': self.first_provisional_votes,
+            'second': self.second_provisional_votes
+        },
+        'previous_votes':{
+            'first': self.first_previous_votes,
+            'second': self.second_previous_votes
+        },
+        'party_id': self.party_id,
+        'constituency_id': self.constituency_id
+        }
+
+Base.metadata.create_all(engine)
+
+def addData():
+        data = read_csv()
+        session = Session()
+        for c in data:
+            id = c.get('id')
+            name = c.get('name')
+            belongs_to = c.get('belongs_to')
+            
+            if belongs_to != '99' and belongs_to != '':
+                d = Constituency(id = id, name = name, belongs_to = belongs_to)
+            else:
+                d = State(id = id, name = name, belongs_to = '99')
+            session.add(d)
+            session.commit()
+            session.flush
+            for i in c.get('parties'):
+                party = get_party_by_name(i.get('name'))
+                if not party is None:
+                    party_id = party.id
+                else:
+                    party = Party(name = name)
+                    session.add(party)
+                    session.commit()
+                    session.flush()
+                    party_id = party.id
+                    
+                votes = Vote(party_id = party.id,constituency_id = id , first_provisional_votes = i.get('first').get('provisional'), first_previous_votes = i.get('first').get('previous'), second_provisional_votes = i.get('second').get('provisional'), second_previous_votes = i.get('second').get('previous')) 
+                session.add(votes)
+                session.commit()
+                session.flush()
 
 
+def get_party_by_name(name):
+        party = session.query(Party).filter(Party.name).first()
+        return party
+
+@app.route('/states', methods=['GET'])    
+def get_states():
+        states = session.query(State.name, State.id).all()
+        return json.dumps(states) 
+
+@app.route('/constituencies/<state>', methods=['GET'])
+def get_constituencies(state):
+        constituencies = session.query(Constituency.serializable).filter_by(state_id = state).all()
+        return json.dumps(constituencies)
+
+@app.route('/constituencies/<constituency>', methods=['GET'])
+def get_votes(constituency):
+        votes = session.query(Vote.serializable).filter_by(constituency_id = constituency).all()
+        return json.dumps(votes)
 
 @app.route('/')
 def say_hello():
@@ -135,53 +154,9 @@ def get_db () :
  return g.sqlite_db
 
 
-#def query_db():
-@app.route('/all', methods=['GET'])
-def get_all():
-    number = session.query(Btw).all()
-    return jsonify(json.dumps(number, cls=AlchemyEncoder))
-
-
-@app.route('/area', methods=['GET'])
-def get_area():
-    area = session.query(Btw.Gebiet).all()
-    return jsonify(json.dumps(area, cls=AlchemyEncoder))
-
-
-@app.route('/states', methods=['GET'])
-def get_states():
-    area = session.query(Btw.Gebiet, Btw.Nr).filter(Btw.gehört_zu.contains('99')).all()
-    return jsonify(json.dumps(area, cls=AlchemyEncoder))
-
-@app.route('/constituency/<const>', methods=['GET'])
-def get_constituency(const):
-    constituency = session.query(Btw).filter(Btw.Gebiet == const).first()
-    return jsonify(json.dumps(constituency, cls=AlchemyEncoder))
-
-
-@app.route('/constituencies/<name>', methods=['GET'])
-def get_state_by_name(name):
-    state = session.query(Btw.Nr).filter(Btw.Gebiet.contains(name)).filter(Btw.gehört_zu.contains('99')).first()
-    constintuencies = session.query(Btw).filter_by(gehört_zu = state[0]).all()
-    return jsonify(json.dumps(constintuencies, cls=AlchemyEncoder))
-
-    
-@app.route('/constituencies/nr/<state>', methods=['GET'])
-def get_constituencies(state):
-    constituencies = session.query(Btw).filter_by(gehört_zu = state).all()
-    return jsonify(json.dumps(constituencies, cls=AlchemyEncoder))
-    
-
-@app.route('/test', methods=['GET'])
-def get_test():
-    constituencies = session.query(Btw.Nr, Btw.Gebiet, Btw.gehört_zu, Btw.Wahlberechtigte_Erststimmen).filter_by(gehört_zu = '99').all()
-    return jsonify(json.dumps(constituencies, cls=AlchemyEncoder))
-        
-
 @app.teardown_appcontext
 def close_db (error):
   if hasattr (g, 'sqlite_db'):g.sqlite_db.close ()
-
 
 
 class AlchemyEncoder(json.JSONEncoder):
