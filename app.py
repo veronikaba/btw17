@@ -109,10 +109,11 @@ def addData():
             session.flush
             for i in c.get('parties'):
                 party = get_party_by_name(i.get('name'))
+                party_id = []
                 if not party is None:
                     party_id = party.id
                 else:
-                    party = Party(name = name)
+                    party = Party(name = i.get('name'))
                     session.add(party)
                     session.commit()
                     session.flush()
@@ -125,7 +126,7 @@ def addData():
 
 
 def get_party_by_name(name):
-        party = session.query(Party).filter(Party.name).first()
+        party = session.query(Party).filter_by(name = name).first()
         return party
 
 @app.route('/states', methods=['GET'])    
@@ -179,5 +180,5 @@ class AlchemyEncoder(json.JSONEncoder):
             return fields
 
         return json.JSONEncoder.default(self, obj)
-
+addData()
 app.run(debug=True)

@@ -6,7 +6,8 @@ def formatResult(name, result):
       constituency = {
 			  'name': name[count],
 			  'first': {
-				  'provisional': result[count]
+				  'provisional': result[count],
+          'previous': result[count+1]
 				  },
 			  'second': {
 				  'provisional': result[count + 2],
