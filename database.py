@@ -22,6 +22,7 @@ class State(Base):
     __tablename__ = 'states'
     id = Column(Integer, primary_key = True)
     name = Column(String)
+    belongs_to = Column(Integer)
     constituencies = relationship('Constituency')
 
     @property
@@ -29,24 +30,23 @@ class State(Base):
         return{
             'id': self.id,
             'name': self.name,
-            'belongs_to': self.belongs_to,
-            'constituencies': self.constituencies
+            'belongs_to': self.belongs_to
         }
 
 class Constituency(Base):
-    __tablename__ = 'constituencies'    
+    __tablename__ = 'constituencies'
     id = Column(Integer, primary_key = True, nullable = False)
     name = Column(String)
     belongs_to = Column(Integer, ForeignKey('states.id'))
     state = relationship('State')
-    parties = relationship('Party')
+    votes = relationship('Vote')
 
     @property
     def serializable(self):
         return{
             'id': self.id,
-            'belongs_to': self.belongs_to,
-            'results': self.parties
+            'name': self.id,
+            'belongs_to': self.belongs_to
         }
 
 class Party(Base):
@@ -54,38 +54,41 @@ class Party(Base):
     id = Column(Integer, primary_key = True, nullable = False)
     name = Column(String)        
     votes = relationship("Vote")
-    votes = relationship('Constituency')
 
     @property
     def serializable(self):
         return{
             'id': self.id,
-            'name': self.name,
-            'constituencies_id': self.constituencies_id,
-            'constituencies': self.constituencies,
-            'votes': self.votes
+            'name': self.name
         }
     
  
 class Vote(Base):
     __tablename__ = 'votes'
     id = Column(Integer, primary_key=True)
-    first_provisionally_votes = Column(Integer)
+    first_provisional_votes = Column(Integer)
     first_previous_votes = Column(Integer)
-    second_provisionally_votes = Column(Integer)
+    second_provisional_votes = Column(Integer)
     second_previous_votes = Column(Integer)
     party_id = Column(Integer, ForeignKey('parties.id'))
     party = relationship('Party')
-    constituency_id = (Integer, ForeignKey('constituenies.id')
-    constituency = relationship('constituency')
+    constituency_id = (Integer, ForeignKey('constituenies.id'))
+    constituency = relationship('Constituency')
 
     @property
     def serializable(self):
         return{
         'id': self.id,
-        'provisionally_votes': self.provisionally_votes,
-        'previouse_votes': self.prevous_votes,
-        'party': self.party
+        'provisionall_votes': {
+            'first': self.first_provisional_votes,
+            'second': self.second_provisional_votes
+        },
+        'previous_votes':{
+            'first': self.first_previous_votes,
+            'second': self.second_previous_votes
+        },
+        'party_id': self.party_id,
+        'constituency_id': self.constituency_id
         }
 
 Base.metadata.create_all(engine)
@@ -121,17 +124,26 @@ def addData():
                 session.commit()
                 session.flush()
 
-def get_party_by_name(name):
-        party = session.query(Party).filter(Party.name).first()
-        return json.dumps(party)
-    
-def get_states():
-        states = session.query(State.id, State.name).all()
-        return json.dumps(states.serializable) 
 
-def get_constituencies(state_id):
-        constituencies = session.query(Constituency.id, Constituency.name).filter_by(state_id = state_id).all()
-        return json.dumps(constituencies.serializable)
+
+def get_party_by_name(name):
+        party = session.query(Party.serializable).filter(Party.name).first()
+        return json.dumps(party)
+
+@app.route('/states', methods=['GET'])    
+def get_states():
+        states = session.query(State.serializable).all()
+        return json.dumps(states) 
+
+@app.route('/constituencies/<state>', methods=['GET'])
+def get_constituencies(state):
+        constituencies = session.query(Constituency.serializable).filter_by(state_id = state).all()
+        return json.dumps(constituencies)
+
+@app.route('/constituencies/<constituency>', methods=['GET'])
+def get_votes(constituency):
+        votes = session.query(Vote.serializable).filter_by(constituency_id = constituency).all()
+        return json.dumps(votes)
 
 def get_db():
     if not hasattr(g, 'sqlight_db'):
