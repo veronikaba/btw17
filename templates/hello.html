@@ -30,7 +30,7 @@
         <h1>Wahlkreis</h1>
         <input type="text" ng-model="search">
         <ul ng-model="constituency">
-          <li ng-repeat="constituency in constituencies | filter:search"><a href ng-click="showDetails(constituency)"> {{constituency}}</a></li>
+          <li ng-repeat="constituency in constituencies | filter:search"><a href ng-click="showDetails(constituency)"> {{constituency.name}}</a></li>
         </ul>
       </div>
       <div class="col">
