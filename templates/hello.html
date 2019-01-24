@@ -23,14 +23,14 @@
       <div class="col">
         <h1>Bundesland</h1>
         <ul ng-model="state">
-          <li ng-repeat="state in states"><a href ng-click="showConstituencies(state)">{{state}}</a></li>
+          <li ng-repeat="state in states"><a href ng-click="showConstituencies(state)">{{state.name}}</a></li>
         </ul>
       </div>
       <div class="col">
         <h1>Wahlkreis</h1>
         <input type="text" ng-model="search">
         <ul ng-model="constituency">
-          <li ng-repeat="constituency in constituencies | filter:search"><a href ng-click="showDetails(constituency)"> {{constituency}}</a></li>
+          <li ng-repeat="constituency in constituencies | filter:search"><a href ng-click="showDetails(constituency)"> {{constituency.name}}</a></li>
         </ul>
       </div>
       <div class="col">
