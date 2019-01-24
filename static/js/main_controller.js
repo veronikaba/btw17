@@ -1,4 +1,6 @@
 var app = angular.module('app', ["chart.js"]);
+
+app.controller("main_controller", function ($scope, $rootScope, $http){
   // the array contains modules that this module
   // depends on. In this case: none => empty array
   function compare(a,b) {
@@ -25,7 +27,7 @@ var app = angular.module('app', ["chart.js"]);
 
   // constructor of the controller
   // variable $scope is the ViewModel
-  app.controller("main_controller", function ($scope, $rootScope, $http) {
+  
     $http.get('/states').success(function(response){
       var states = []
       console.log(response)
@@ -51,13 +53,51 @@ var app = angular.module('app', ["chart.js"]);
       });
     }
     $scope.showDetails = function (constituency) {
-      $http.get('/votes/'+ constituency.id).success(function(response){
-       console.log(response)
+    
+      $http.get('/constituency/'+ constituency).success(function(response){
+        var response = JSON.parse(response)
+        var parties = []
+        var keys = [];
+        var votes = []
+        var oldString = '';
+        console.log(response)
+        for(var k in response){
+          if(k !== 'Gebiet' && k !== 'Nr' && k !== 'serializable' && k !== 'gehört_zu' ){
+          var tempString = k
+          tempString = tempString.replace('Erststimmen', "")
+          tempString = tempString.replace('Zweitstimmen', "")
+          tempString = tempString.replace(/_/g, ' ')
+          if(oldString != tempString){
+           keys.push(tempString);
+            oldString = tempString  
+          }
+          votes.push(response[k])
+         }
+        }
+        var i = 0;
+        var j = 0
+        while (i < keys.length){
+        // every vote votes on pos j %2 =0 is first vote else second
+        var v1 =0;
+        var v2 =0;
+        if(votes[j]){
+          v1 = parseInt(votes[j]);
+        }
+        if(votes[j+1]){
+          v2 = parseInt(votes[j+1]);
+        }
+        var party = {party:keys[i], firstVotes:v1, secondVotes: v2 };
+         i = i+1 
+         j = j+2
+         parties.push(party)
+        }
+        parties = parties.sort(compare)
+        parties = addPercentage(parties)
+        $scope.parties = parties
+        $rootScope.$broadcast('partyData', parties)
       })
     }
-  });
-
-  app.controller('bar_controller', function($scope, $rootScope){
+  
     var parties = [];
     var primary = []
     var secondary = []
@@ -79,9 +119,8 @@ var app = angular.module('app', ["chart.js"]);
      "rgba(0, 255, 255, 1)",
      "rgba(100, 255, 100, 1)"]]
     });
-  });
+ 
 
-  app.controller('firstVotes_pie_ctrl', function($scope, $rootScope){
     var parties = [];
     var primary = []
     $rootScope.$on('partyData', function(event, data) {
@@ -95,9 +134,7 @@ var app = angular.module('app', ["chart.js"]);
       primary
     ];
    });
-  });
-
-  app.controller('secondVotes_pie_ctrl', function($scope, $rootScope){
+ 
     var parties = [];
     var secondary = []
     $rootScope.$on('partyData', function(event, data) {

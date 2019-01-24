@@ -17,9 +17,9 @@
   <script src="../static/bower_components/angular-chart.js/dist/angular-chart.min.js"></script>
 </head>
 
-<body ng-app="app">
+<body ng-app="app" ng-controller="main_controller">
   <div class="container">
-    <div class="row" ng-controller="main_controller">
+    <div class="row">
       <div class="col">
         <h1>Bundesland</h1>
         <ul ng-model="state">
@@ -55,7 +55,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="col" ng-controller="bar_controller" chart-colors="colors">
+      <div class="col" chart-colors="colors">
           <h8>Übersicht Erst- und Zweitstimmen</h8>
           <canvas style="width: 100%" id="bar" class="chart chart-bar"
             chart-data="data" chart-labels="labels"> chart-series="series"
@@ -63,7 +63,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="col" ng-controller='firstVotes_pie_ctrl' chart-colors="colors">
+      <div class="col" chart-colors="colors">
           <h8>Verteilung Erststimmen</h8>
         <canvas style="width: 50%" id="pie" class="chart chart-pie"
         chart-data="data" chart-labels="labels" chart-options="options">
@@ -71,7 +71,7 @@
     </div>
     <div class="col">
         <h8>Verteilung Zweitstimmen</h8>
-        <div class="col" ng-controller='secondVotes_pie_ctrl' chart-colors="colors">
+        <div class="col" chart-colors="colors">
             <canvas style="width: 50%" id="pie" class="chart chart-pie"
             chart-data="data" chart-labels="labels" chart-options="options">
           </canvas>
