@@ -32,7 +32,7 @@ def read_csv():
               'id': row[0],
               'name': row[1],
               'belongs_to': row[2],
-              'parties': formatResult(columns, ro w)
+              'parties': formatResult(columns, row)
             }
             states.append(state)
             line_count_id += 1
