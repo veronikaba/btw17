@@ -1,4 +1,6 @@
 var app = angular.module('app', ["chart.js"]);
+
+app.controller("main_controller", function ($scope, $rootScope, $http){
   // the array contains modules that this module
   // depends on. In this case: none => empty array
   function compare(a,b) {
@@ -25,7 +27,7 @@ var app = angular.module('app', ["chart.js"]);
 
   // constructor of the controller
   // variable $scope is the ViewModel
-  app.controller("main_controller", function ($scope, $rootScope, $http) {
+  
     $http.get('/states').success(function(response){
       var response = JSON.parse(response)
       var states = []
@@ -57,6 +59,7 @@ var app = angular.module('app', ["chart.js"]);
         var keys = [];
         var votes = []
         var oldString = '';
+        console.log(response)
         for(var k in response){
           if(k !== 'Gebiet' && k !== 'Nr' && k !== 'serializable' && k !== 'gehört_zu' ){
           var tempString = k
@@ -93,9 +96,7 @@ var app = angular.module('app', ["chart.js"]);
         $rootScope.$broadcast('partyData', parties)
       })
     }
-  });
-
-  app.controller('bar_controller', function($scope, $rootScope){
+  
     var parties = [];
     var primary = []
     var secondary = []
@@ -117,9 +118,8 @@ var app = angular.module('app', ["chart.js"]);
      "rgba(0, 255, 255, 1)",
      "rgba(100, 255, 100, 1)"]]
     });
-  });
+ 
 
-  app.controller('firstVotes_pie_ctrl', function($scope, $rootScope){
     var parties = [];
     var primary = []
     $rootScope.$on('partyData', function(event, data) {
@@ -133,9 +133,7 @@ var app = angular.module('app', ["chart.js"]);
       primary
     ];
    });
-  });
-
-  app.controller('secondVotes_pie_ctrl', function($scope, $rootScope){
+ 
     var parties = [];
     var secondary = []
     $rootScope.$on('partyData', function(event, data) {
