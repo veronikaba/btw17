@@ -72,7 +72,7 @@ class Vote(Base):
     second_previous_votes = Column(Integer)
     party_id = Column(Integer, ForeignKey('parties.id'))
     party = relationship('Party')
-    constituency_id = Column(Integer, ForeignKey('constituenies.id'))
+    constituency_id = Column(Integer, ForeignKey('constituencies.id'))
     constituency = relationship('Constituency')
 
     @property
@@ -119,7 +119,7 @@ def addData():
                     session.flush()
                     party_id = party.id
                     
-                votes = Vote(party_id = party.id,constituency_id = belongs_to , first_provisionally_votes = i.get('first').get('provisional'), first_previous_votes = i.get('first').get('previous'), second_provisionally_votes = i.get('second').get('provisional'), second_previous_votes = i.get('second').get('previous')) 
+                votes = Vote(party_id = party.id,constituency_id = id , first_provisionally_votes = i.get('first').get('provisional'), first_previous_votes = i.get('first').get('previous'), second_provisionally_votes = i.get('second').get('provisional'), second_previous_votes = i.get('second').get('previous')) 
                 session.add(votes)
                 session.commit()
                 session.flush()
