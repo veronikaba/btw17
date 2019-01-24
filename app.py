@@ -133,19 +133,25 @@ def get_states():
         states = session.query(State.name, State.id).all()
         return json.dumps(states) 
 
-@app.route('/constituencies/<state>', methods=['GET'])
-def get_constituencies(state):
-        constituencies = session.query(Constituency.serializable).filter_by(state_id = state).all()
+@app.route('/constituencies/<state_id>', methods=['GET'])
+def get_constituencies(state_id):
+        constituencies = session.query(Constituency.name, Constituency.id).filter(Constituency.belongs_to == state_id).all()
         return json.dumps(constituencies)
 
-@app.route('/constituencies/<constituency>', methods=['GET'])
-def get_votes(constituency):
-        votes = session.query(Vote.serializable).filter_by(constituency_id = constituency).all()
-        return json.dumps(votes)
+@app.route('/votes/<constituency_id>', methods=['GET'])
+def get_votes(constituency_id):
+        votes = session.query(Vote).filter_by(constituency_id = constituency_id).all()
+        logging.error(votes)
+        return jsonify(json.dumps(votes, cls=AlchemyEncoder))
 
 @app.route('/')
 def say_hello():
     return send_from_directory("templates", "hello.html")
+
+@app.route('/parties/id')
+def getParty(id):
+    party = session.query(Party.name).filter_by(id = id).all
+    return party
 
 def get_db () :
  if not hasattr(g,'sqlite_db'):
@@ -153,11 +159,9 @@ def get_db () :
   g.sqlite_db = con
  return g.sqlite_db
 
-
 @app.teardown_appcontext
 def close_db (error):
   if hasattr (g, 'sqlite_db'):g.sqlite_db.close ()
-
 
 class AlchemyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -176,5 +180,4 @@ class AlchemyEncoder(json.JSONEncoder):
 
         return json.JSONEncoder.default(self, obj)
 
-            
 app.run(debug=True)
