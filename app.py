@@ -78,7 +78,7 @@ class Vote(Base):
     def serializable(self):
         return{
         'id': self.id,
-        'provisionall_votes': {
+        'provisional_votes': {
             'first': self.first_provisional_votes,
             'second': self.second_provisional_votes
         },
@@ -142,7 +142,6 @@ def get_constituencies(state_id):
 @app.route('/votes/<constituency_id>', methods=['GET'])
 def get_votes(constituency_id):
         votes = session.query(Vote).filter_by(constituency_id = constituency_id).all()
-        logging.error(votes)
         return jsonify(json.dumps(votes, cls=AlchemyEncoder))
 
 @app.route('/')
@@ -180,5 +179,5 @@ class AlchemyEncoder(json.JSONEncoder):
             return fields
 
         return json.JSONEncoder.default(self, obj)
-addData()
+#addData()
 app.run(debug=True)
