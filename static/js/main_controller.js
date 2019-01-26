@@ -1,6 +1,17 @@
 var app = angular.module('app', ["chart.js"]);
 
-app.controller("main_controller", function ($scope, $rootScope, $http){
+
+function compare(a,b) {
+  console.log(a)
+  if ((a.erststimme + a.zweitstimme) > (b.erststimme + b.zweitstimme))
+  return -1;
+  if ((a.erststimme + a.zweitstimme) < (b.erststimme + b.zweitstimme))
+  return 1;
+  return 0;
+}
+app.controller("main_controller", function ($scope, $http){
+  $scope.series = ['Erststimme', 'Zweitstimme'];
+  $scope.colors = ['#FD1F5E','#1EF9A1','#7FFD1F','#68F000'];
  
     $http.get('/states').success(function(response){
       var states = []
@@ -46,12 +57,13 @@ app.controller("main_controller", function ($scope, $rootScope, $http){
               partyName.push(tableObject.party_name)
               firstVotes.push(tableObject.erststimme)
               secondVotes.push(tableObject.zweitstimme)
-              tableObject.erststimme = ((tableObject.erststimme / all.erststimme)*100).toFixed(2)
-              tableObject.zweitstimme = ((tableObject.zweitstimme / all.zweitstimme)*100).toFixed(2)
+              tableObject.erststimme = parseFloat(((tableObject.erststimme / all.erststimme)*100).toFixed(2))
+              tableObject.zweitstimme = parseFloat(((tableObject.zweitstimme / all.zweitstimme)*100).toFixed(2))
               parties.push(tableObject)
             }
           }
         }
+        parties = parties.sort(compare)
         $scope.parties = parties
         $scope.labels = partyName;
         $scope.data = [
@@ -63,11 +75,6 @@ app.controller("main_controller", function ($scope, $rootScope, $http){
         $scope.dataPieSecond = [
           secondVotes
         ];
-        $scope.colors = ["rgba(0, 0, 0, 1)",
-        "rgba(255, 0, 0, 1)",
-        "rgba(0, 255, 0, 1)",
-        "rgba(0, 255, 255, 1)",
-        "rgba(100, 255, 100, 1)"]
       })
     }
 

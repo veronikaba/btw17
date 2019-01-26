@@ -15,6 +15,11 @@
   <!-- chart.js and angular-chart.js -->
   <script src="../static/bower_components/chart.js/dist/Chart.min.js"></script>
   <script src="../static/bower_components/angular-chart.js/dist/angular-chart.min.js"></script>
+
+  <style>
+    
+  </style>
+
 </head>
 
 <body ng-app="app" ng-controller="main_controller">
@@ -56,23 +61,23 @@
     </div>
     <div class="row">
       <div class="col" >
-          <h8>Übersicht Erst- und Zweitstimmen</h8>
-          <canvas style="width: 100%" id="bar" chart-colors="colors" class="chart chart-bar"
-            chart-data="data" chart-labels="labels" chart-series="series">
+          <h3>Übersicht Erst- und Zweitstimmen</h3>
+          <canvas style="width: 100%" id="bar" class="chart chart-bar" 
+            chart-data="data" chart-labels="labels" chart-series="series" chart-options="options" chart-colors="colors">
           </canvas>
       </div>
     </div>
     <div class="row">
       <div class="col" >
-          <h8>Verteilung Erststimmen</h8>
+          <h3 id="erst">Verteilung Erststimmen</h3>
         <canvas style="width: 50%" id="pie" chart-colors="colors" class="chart chart-pie"
         chart-data="dataPieFirst"  chart-labels="labels" >
       </canvas> 
     </div>
     <div class="col">
-        <h8>Verteilung Zweitstimmen</h8>
-        <div class="col" >
-            <canvas style="width: 50%" id="pie" chart-colors="colors" class="chart chart-pie"
+      <h3>Verteilung Zweitstimmen</h3>
+      <div class="col" >
+            <canvas style="width: 50%" id="pie" class="chart chart-pie"
             chart-data="dataPieSecond" chart-labels="labels" >
           </canvas>
     </div>

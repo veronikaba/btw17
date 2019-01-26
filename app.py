@@ -92,7 +92,7 @@ class Vote(Base):
 
 Base.metadata.create_all(engine)
 
-def addData():
+def fillDatabase():
         data = read_csv()
         session = Session()
         for c in data:
@@ -179,5 +179,5 @@ class AlchemyEncoder(json.JSONEncoder):
             return fields
 
         return json.JSONEncoder.default(self, obj)
-#addData()
+#fillDatabase()
 app.run(debug=True)
