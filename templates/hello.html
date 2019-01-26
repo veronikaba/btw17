@@ -46,34 +46,34 @@
               </thead>
               <tbody>
                 <tr ng-repeat= " x in parties track by $index">
-                  <td>{{x.party_name}}</td>
-                  <td>{{x.erststimme}}%</td>
-                  <td>{{x.zweitstimme}}%</td>
+                  <td>{{x.party_id}}</td>
+                  <td>{{x.first_provisional_votes}}%</td>
+                  <td>{{x.second_provisional_votes}}%</td>
                 </tr>
               </tbody>
         </table>
       </div>
     </div>
     <div class="row">
-      <div class="col" >
+      <div class="col" chart-colors="colors">
           <h8>Übersicht Erst- und Zweitstimmen</h8>
-          <canvas style="width: 100%" id="bar" chart-colors="colors" class="chart chart-bar"
-            chart-data="data" chart-labels="labels" chart-series="series">
+          <canvas style="width: 100%" id="bar" class="chart chart-bar"
+            chart-data="data" chart-labels="labels"> chart-series="series"
           </canvas>
       </div>
     </div>
     <div class="row">
-      <div class="col" >
+      <div class="col" chart-colors="colors">
           <h8>Verteilung Erststimmen</h8>
-        <canvas style="width: 50%" id="pie" chart-colors="colors" class="chart chart-pie"
-        chart-data="dataPieFirst"  chart-labels="labels" >
+        <canvas style="width: 50%" id="pie" class="chart chart-pie"
+        chart-data="data" chart-labels="labels" chart-options="options">
       </canvas> 
     </div>
     <div class="col">
         <h8>Verteilung Zweitstimmen</h8>
-        <div class="col" >
-            <canvas style="width: 50%" id="pie" chart-colors="colors" class="chart chart-pie"
-            chart-data="dataPieSecond" chart-labels="labels" >
+        <div class="col" chart-colors="colors">
+            <canvas style="width: 50%" id="pie" class="chart chart-pie"
+            chart-data="data" chart-labels="labels" chart-options="options">
           </canvas>
     </div>
   </div>
