@@ -45,10 +45,10 @@
                 </tr>
               </thead>
               <tbody>
-                <tr ng-repeat= " x in parties">
-                  <td>{{x.party}}</td>
-                  <td>{{x.firstVotesPercentage}}%</td>
-                  <td>{{x.secondVotesPercentage}}%</td>
+                <tr ng-repeat= " x in parties track by $index">
+                  <td>{{x.party_id}}</td>
+                  <td>{{x.first_provisional_votes}}%</td>
+                  <td>{{x.second_provisional_votes}}%</td>
                 </tr>
               </tbody>
         </table>

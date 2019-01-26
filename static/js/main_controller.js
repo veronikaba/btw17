@@ -55,7 +55,78 @@ app.controller("main_controller", function ($scope, $rootScope, $http){
     $scope.showDetails = function (constituency) {
     
       $http.get('/votes/'+ constituency.id).success(function(response){
-       
+        var response = JSON.parse(response)
+        var parties = []
+        var firstVotes = []
+        for(var i=0; i<response.length; i++){
+          parties.push(response[i])
+          //$scope.parties = parties
+          if(parties[i].first_provisional_votes){
+            firstVotes.push(parties[i].first_provisional_votes)
+          } 
+        }
+        var percent = []
+        for(var j = 0; j< parties.length; j++ ){
+          if(parties[j].first_provisional_votes){
+            percent.push((parties[j].first_provisional_votes / allFirstVotes(firstVotes))*100)
+          }
+        }
+        console.log(parties[j].first_provisional_votes)
+
+
+        function allFirstVotes (firstVotes){
+
+          var intVotes =[]
+          for(var j=0; j<firstVotes.length; j++){
+            var intVote = parseInt(firstVotes[j])
+            intVotes.push(intVote);
+          }
+          function getSum(total, num){
+            return total + num;
+          }
+          var allFirstVotes = intVotes.reduce(getSum)
+          return allFirstVotes
+  
+        }
+        /*var keys = [];
+        var votes = []
+        var oldString = '';
+        console.log(response)
+        for(var k in response){
+          if(k !== 'Gebiet' && k !== 'Nr' && k !== 'serializable' && k !== 'gehört_zu' ){
+          var tempString = k
+          tempString = tempString.replace('Erststimmen', "")
+          tempString = tempString.replace('Zweitstimmen', "")
+          tempString = tempString.replace(/_/g, ' ')
+          if(oldString != tempString){
+           keys.push(tempString);
+            oldString = tempString  
+          }
+          votes.push(response[k])
+         }
+        }
+        /*
+        var i = 0;
+        var j = 0
+        while (i < keys.length){
+        // every vote votes on pos j %2 =0 is first vote else second
+        var v1 =0;
+        var v2 =0;
+        if(votes[j]){
+          v1 = parseInt(votes[j]);
+        }
+        if(votes[j+1]){
+          v2 = parseInt(votes[j+1]);
+        }
+        var party = {party:keys[i], firstVotes:v1, secondVotes: v2 };
+         i = i+1 
+         j = j+2
+         parties.push(party)
+        }
+        parties = parties.sort(compare)
+        parties = addPercentage(parties)
+        $scope.parties = parties
+        $rootScope.$broadcast('partyData', parties)*/
       })
     }
   
