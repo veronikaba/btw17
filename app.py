@@ -141,17 +141,17 @@ def get_constituencies(state_id):
 
 @app.route('/votes/<constituency_id>', methods=['GET'])
 def get_votes(constituency_id):
-        votes = session.query(Vote).filter_by(constituency_id = constituency_id).all()
+        votes = session.query(Vote, Party.name).filter_by(constituency_id = constituency_id).filter(Vote.party_id == Party.id).all()
         return jsonify(json.dumps(votes, cls=AlchemyEncoder))
 
 @app.route('/')
 def say_hello():
     return send_from_directory("templates", "hello.html")
 
-@app.route('/parties/id')
+@app.route('/parties/<id>')
 def getParty(id):
-    party = session.query(Party.name).filter_by(id = id).all
-    return party
+    party = session.query(Party.name).filter_by(id = id).all()
+    return json.dumps(party)
 
 def get_db () :
  if not hasattr(g,'sqlite_db'):

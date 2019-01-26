@@ -1,36 +1,9 @@
 var app = angular.module('app', ["chart.js"]);
 
 app.controller("main_controller", function ($scope, $rootScope, $http){
-  // the array contains modules that this module
-  // depends on. In this case: none => empty array
-  function compare(a,b) {
-    if ((a.firstVotes + a.secondVotes) > (b.firstVotes + b.secondVotes))
-      return -1;
-    if ((a.firstVotes + a.secondVotes) < (b.firstVotes + b.secondVotes))
-      return 1;
-    return 0;
-  }
-
-  function addPercentage(list){
-    var newList = []
-    var validVotes = list[0]
-    list.forEach(function(entry){
-      if( entry.party !== "Gültige " ){
-        var vp1 = (entry.firstVotes/validVotes.firstVotes * 100).toFixed(1)
-        var vp2 = (entry.secondVotes/validVotes.secondVotes * 100).toFixed(1)
-
-          var newPartyWithPercentage  = {party: entry.party, firstVotes:entry.firstVotes, secondVotes: entry.secondVotes, firstVotesPercentage: vp1, secondVotesPercentage: vp2};
-          newList.push(newPartyWithPercentage)
-        }})
-        return newList
-  }
-
-  // constructor of the controller
-  // variable $scope is the ViewModel
-  
+ 
     $http.get('/states').success(function(response){
       var states = []
-      console.log(response)
       for (var i = 0; i < response.length; i++){
         var state = {name: response[i][0], id: response[i][1]}
         states.push(state)
@@ -52,132 +25,50 @@ app.controller("main_controller", function ($scope, $rootScope, $http){
         console.log(response)
       });
     }
+
     $scope.showDetails = function (constituency) {
-    
+      
       $http.get('/votes/'+ constituency.id).success(function(response){
         var response = JSON.parse(response)
         var parties = []
+        var partyName = []
         var firstVotes = []
-        for(var i=0; i<response.length; i++){
-          parties.push(response[i])
-          //$scope.parties = parties
-          if(parties[i].first_provisional_votes){
-            firstVotes.push(parties[i].first_provisional_votes)
-          } 
-        }
-        var percent = []
-        for(var j = 0; j< parties.length; j++ ){
-          if(parties[j].first_provisional_votes){
-            percent.push((parties[j].first_provisional_votes / allFirstVotes(firstVotes))*100)
+        var secondVotes = []
+        var all = [];
+      
+        for(var i=3; i<response.length; i++){
+          var tableObject = { party_name: response[i][1], erststimme:response[i][0].first_provisional_votes, zweitstimme: response[i][0].second_provisional_votes}
+          if(i == 3){
+            all = tableObject
+          }
+          else if(tableObject.erststimme || tableObject.zweitstimme){
+            if(all){
+              partyName.push(tableObject.party_name)
+              firstVotes.push(tableObject.erststimme)
+              secondVotes.push(tableObject.zweitstimme)
+              tableObject.erststimme = ((tableObject.erststimme / all.erststimme)*100).toFixed(2)
+              tableObject.zweitstimme = ((tableObject.zweitstimme / all.zweitstimme)*100).toFixed(2)
+              parties.push(tableObject)
+            }
           }
         }
-        console.log(parties[j].first_provisional_votes)
-
-
-        function allFirstVotes (firstVotes){
-
-          var intVotes =[]
-          for(var j=0; j<firstVotes.length; j++){
-            var intVote = parseInt(firstVotes[j])
-            intVotes.push(intVote);
-          }
-          function getSum(total, num){
-            return total + num;
-          }
-          var allFirstVotes = intVotes.reduce(getSum)
-          return allFirstVotes
-  
-        }
-        /*var keys = [];
-        var votes = []
-        var oldString = '';
-        console.log(response)
-        for(var k in response){
-          if(k !== 'Gebiet' && k !== 'Nr' && k !== 'serializable' && k !== 'gehört_zu' ){
-          var tempString = k
-          tempString = tempString.replace('Erststimmen', "")
-          tempString = tempString.replace('Zweitstimmen', "")
-          tempString = tempString.replace(/_/g, ' ')
-          if(oldString != tempString){
-           keys.push(tempString);
-            oldString = tempString  
-          }
-          votes.push(response[k])
-         }
-        }
-        /*
-        var i = 0;
-        var j = 0
-        while (i < keys.length){
-        // every vote votes on pos j %2 =0 is first vote else second
-        var v1 =0;
-        var v2 =0;
-        if(votes[j]){
-          v1 = parseInt(votes[j]);
-        }
-        if(votes[j+1]){
-          v2 = parseInt(votes[j+1]);
-        }
-        var party = {party:keys[i], firstVotes:v1, secondVotes: v2 };
-         i = i+1 
-         j = j+2
-         parties.push(party)
-        }
-        parties = parties.sort(compare)
-        parties = addPercentage(parties)
         $scope.parties = parties
-        $rootScope.$broadcast('partyData', parties)*/
+        $scope.labels = partyName;
+        $scope.data = [
+          firstVotes, secondVotes
+        ];
+        $scope.dataPieFirst = [
+          firstVotes
+        ];
+        $scope.dataPieSecond = [
+          secondVotes
+        ];
+        $scope.colors = ["rgba(0, 0, 0, 1)",
+        "rgba(255, 0, 0, 1)",
+        "rgba(0, 255, 0, 1)",
+        "rgba(0, 255, 255, 1)",
+        "rgba(100, 255, 100, 1)"]
       })
     }
-  
-    var parties = [];
-    var primary = []
-    var secondary = []
-    // now get party information... 
-    $rootScope.$on('partyData', function(event, data) {
-      data.forEach(function(entry){
-      if(entry.party !== "Wahlberechtigte" && entry.party !== "Wähler" && entry.party !=='Ungültige' && entry.party !== "Gültige" ){
-       parties.push(entry.party)
-       primary.push(entry.firstVotes)
-       secondary.push(entry.secondVotes) 
-      }})
-     $scope.labels = parties;
-     $scope.data = [
-       primary, secondary
-     ];
-     $scope.colors = [["rgba(0, 0, 0, 1)",
-     "rgba(255, 0, 0, 1)",
-     "rgba(0, 255, 0, 1)",
-     "rgba(0, 255, 255, 1)",
-     "rgba(100, 255, 100, 1)"]]
-    });
- 
 
-    var parties = [];
-    var primary = []
-    $rootScope.$on('partyData', function(event, data) {
-     data.forEach(function(entry){
-      if( entry.party !== "Wahlberechtigte" && entry.party !== "Wähler" && entry.party !=='Ungültige' && entry.party !== "Gültige" ){
-      parties.push(entry.party)
-      primary.push(entry.firstVotes)
-     }})
-    $scope.labels = parties;
-    $scope.data = [
-      primary
-    ];
-   });
- 
-    var parties = [];
-    var secondary = []
-    $rootScope.$on('partyData', function(event, data) {
-     data.forEach(function(entry){
-      if(entry.party !== "Wahlberechtigte " && entry.party !== "Wähler " && entry.party !=='Ungültige ' && entry.party !== "Gültige " ){
-        parties.push(entry.party)
-        secondary.push(entry.secondVotes)
-     }})
-    $scope.labels = parties;
-    $scope.data = [
-      secondary
-    ];
-   });
   });
