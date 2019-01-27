@@ -2,7 +2,6 @@ var app = angular.module('app', ["chart.js"]);
 
 
 function compare(a,b) {
-  console.log(a)
   if ((a.erststimme + a.zweitstimme) > (b.erststimme + b.zweitstimme))
   return -1;
   if ((a.erststimme + a.zweitstimme) < (b.erststimme + b.zweitstimme))

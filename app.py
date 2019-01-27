@@ -99,30 +99,31 @@ def fillDatabase():
             id = c.get('id')
             name = c.get('name')
             belongs_to = c.get('belongs_to')
-            
             if belongs_to != '99' and belongs_to != '':
                 d = Constituency(id = id, name = name, belongs_to = belongs_to)
+              
+                for i in c.get('parties'):
+                    party = get_party_by_name(i.get('name'))
+                    party_id = []
+                    if not party is None:
+                        party_id = party.id
+                    else:
+                        party = Party(name = i.get('name'))
+                        session.add(party)
+                        session.flush()
+                        party_id = party.id
+                    
+                    session.add(d)
+                    session.commit()
+                    votes = Vote(party_id = party.id,constituency_id = id , first_provisional_votes = i.get('first').get('provisional'), first_previous_votes = i.get('first').get('previous'), second_provisional_votes = i.get('second').get('provisional'), second_previous_votes = i.get('second').get('previous')) 
+                    session.add(votes)
+                    session.commit()
             else:
                 d = State(id = id, name = name, belongs_to = '99')
-            session.add(d)
-            session.commit()
-            session.flush
-            for i in c.get('parties'):
-                party = get_party_by_name(i.get('name'))
-                party_id = []
-                if not party is None:
-                    party_id = party.id
-                else:
-                    party = Party(name = i.get('name'))
-                    session.add(party)
-                    session.commit()
-                    session.flush()
-                    party_id = party.id
-                    
-                votes = Vote(party_id = party.id,constituency_id = id , first_provisional_votes = i.get('first').get('provisional'), first_previous_votes = i.get('first').get('previous'), second_provisional_votes = i.get('second').get('provisional'), second_previous_votes = i.get('second').get('previous')) 
-                session.add(votes)
+                session.add(d)
                 session.commit()
-                session.flush()
+          
+
 
 
 def get_party_by_name(name):
@@ -166,16 +167,16 @@ def close_db (error):
 class AlchemyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj.__class__, DeclarativeMeta):
-            # an SQLAlchemy class
+     
             fields = {}
             for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
                 data = obj.__getattribute__(field)
                 try:
-                    json.dumps(data).encode('utf8') # this will fail on non-encodable values, like other classes
+                    json.dumps(data).encode('utf8')
                     fields[field] = data
                 except TypeError:
                     fields[field] = None
-            # a json-encodable dict
+    
             return fields
 
         return json.JSONEncoder.default(self, obj)
